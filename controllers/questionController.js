@@ -1,0 +1,140 @@
+const Question = require('../models/Question');
+const validate = require('../validations/questionValidation');
+
+// @desc Add a new Question
+// @route Post /api/questions
+// @access private/admin
+const addQuestion = async (req, res, next) => {
+  try {
+    const { question, options, answer } = req.body;
+
+    // Validate Question
+    const { error } = validate({
+      question,
+      options,
+      answer: parseInt(answer),
+    });
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
+    const questionExists = await Question.findOne({ question });
+    if (questionExists) {
+      return res.status(401).json({ message: 'Question already exists' });
+    }
+
+    const questionObject = new Question({
+      question,
+      options,
+      answer: parseInt(answer),
+    });
+
+    await questionObject.save();
+
+    res.status(201).json({ message: 'Question added successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc Edit Question
+// @route Patch /api/questions/:id/edit
+// @access private/admin
+const editQuestion = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const { question, options, answer } = req.body;
+
+    // Validate Question
+    const { error } = validate({
+      question,
+      options,
+      answer: parseInt(answer),
+    });
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
+    const questionObject = await Question.findById(id);
+    if (!questionObject) {
+      return res.status(404).json({ message: 'Question not found' });
+    }
+
+    questionObject.question = question;
+    questionObject.answer = parseInt(answer);
+    questionObject.options = options;
+
+    await questionObject.save();
+
+    res.json(questionObject);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc Get all Questions
+// @route Get /api/questions
+// @access private/admin
+const getQuestions = async (req, res, next) => {
+  try {
+    const questions = await Question.find({});
+
+    res.json(questions);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc Get Question
+// @route Get /api/questions/:id
+// @access private/admin
+const getQuestion = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const question = await Question.findById(id);
+
+    res.json(question);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc Delete Question
+// @route Delete /api/questions/:id/delete
+// @access private/admin
+const deleteQuestion = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const question = await Question.findById(id);
+
+    if (!question) {
+      return res.status(401).json({ message: 'No question to delete' });
+    }
+
+    await question.delete();
+
+    res.json({ message: 'Question deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// // @desc Get Question
+// // @route Get /api/questions/:id
+// // @access private/admin
+// const getQuestion = async (req, res, next) => {
+//   try {
+//     const id = req.params.id;
+//     const question = await Question.findById(id);
+
+//     res.json(questions);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+module.exports.addQuestion = addQuestion;
+module.exports.editQuestion = editQuestion;
+module.exports.getQuestions = getQuestions;
+module.exports.getQuestion = getQuestion;
+module.exports.deleteQuestion = deleteQuestion;
