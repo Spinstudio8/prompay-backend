@@ -7,6 +7,7 @@ const rootRoute = require('./routes/root');
 const questionRoutes = require('./routes/question');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
+const assessmentRoutes = require('./routes/assessment');
 
 const app = express();
 
@@ -25,9 +26,6 @@ app.use(express.json({ limit: '50mb' }));
 app.use(
   cors({
     origin: [process.env.CLIENT_URL, process.env.SERVER_URL],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
   })
 );
 
@@ -36,6 +34,7 @@ app.use('/', rootRoute);
 app.use('/api/questions', questionRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/assessment', assessmentRoutes);
 
 //Error Handler
 app.use(errorHandler);

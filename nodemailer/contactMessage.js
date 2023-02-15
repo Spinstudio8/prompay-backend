@@ -6,12 +6,12 @@ const { google } = require('googleapis');
 const filePath = path.join(__dirname, '../views', 'contact-message.html');
 let html = fs.readFileSync(filePath, 'utf-8');
 
-const user = process.env.USER;
-const pass = process.env.PASS;
-const clientId = process.env.CLIENT_ID;
-const clientSecret = process.env.CLIENT_SECRET;
-const refreshToken = process.env.REFRESH_TOKEN;
-const redirectUri = process.env.REDIRECT_URI;
+const user = process.env.GOOGLE_USER;
+const pass = process.env.GOOGLE_PASS;
+const clientId = process.env.GOOGLE_CLIENT_ID;
+const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
+const redirectUri = process.env.GOOGLE_REDIRECT_URI;
 
 const oAuth2Client = new google.auth.OAuth2(
   clientId,

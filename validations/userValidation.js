@@ -23,6 +23,14 @@ function validateUserLogin(user) {
   return schema.validate(user);
 }
 
+function validateEmail(email) {
+  const schema = Joi.object({
+    email: Joi.string().required().email().label('Email'),
+  });
+
+  return schema.validate(email);
+}
+
 function validateUserProfile(user) {
   const schema = Joi.object({
     firstName: Joi.string().min(2).max(50).required().label('First name'),
@@ -44,5 +52,6 @@ function adminValidateUserProfile(user) {
 
 module.exports.validateUserSignup = validateUserSignup;
 module.exports.validateUserLogin = validateUserLogin;
+module.exports.validateEmail = validateEmail;
 module.exports.validateUserProfile = validateUserProfile;
 module.exports.adminValidateUserProfile = adminValidateUserProfile;

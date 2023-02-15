@@ -1,6 +1,7 @@
 const express = require('express');
 const {
   signupUser,
+  sendVerificationCode,
   getUserProfile,
   updateUserProfile,
   getUsers,
@@ -13,6 +14,7 @@ const {
 const router = express.Router();
 
 router.post('/signup', signupUser);
+router.post('/verification-code', sendVerificationCode);
 router.post('/verify', verifyCode);
 router.route('/:id/profile').get(getUserProfile).patch(updateUserProfile);
 router.get('/', getUsers);

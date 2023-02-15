@@ -3,18 +3,23 @@
   <head>
     <meta charset="utf-8" />
     <title>Sign up Verification</title>
+    <style>
+      .code {
+        font-weight: 700;
+        font-size: 25px;
+      }
+    </style>
   </head>
   <body>
     <h1>Account verification</h1>
     <hr />
     <br />
     <p>Dear {{lastName}}</p>
-    <br />
     <p>Thank you for signing up for our service!</p>
     <p>
       Please use the following verification code to complete your registration:
     </p>
-    <p>{{verificationCode}}</p>
+    <p class="code">{{verificationCode}}</p>
     <p>
       This code will expire in {{verificationCodeExpiration}}. If you didn't
       complete this verification you won't be able to login and your account

@@ -1,9 +1,12 @@
+const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const { sendCode } = require('../nodemailer/verificationMessage');
+const generateCode = require('../utils/generateCode');
 const { generateToken } = require('../utils/generateToken');
 const {
   validateUserProfile,
   validateUserSignup,
+  validateEmail,
 } = require('../validations/userValidation');
 
 // @desc Signup user
@@ -37,8 +40,9 @@ const signupUser = async (req, res, next) => {
 
     // hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
+
     // generate the verification code (4 digits)
-    const verificationCode = Math.floor(1000 + Math.random() * 9000);
+    const verificationCode = generateCode();
     const verificationCodeExpiration = Date.now() + 300000; // current time + 5m (300,000ms)
 
     // create a new user
@@ -74,16 +78,61 @@ const signupUser = async (req, res, next) => {
   }
 };
 
+// @desc Send user verification code
+// @route Post /api/users/verification-code
+// @Access Public
+const sendVerificationCode = async (req, res, next) => {
+  try {
+    const { error } = validateEmail(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // generate the verification code (4 digits)
+    const verificationCode = generateCode();
+    const verificationCodeExpiration = Date.now() + 300000; // current time + 5m (300,000ms)
+
+    user.verificationCode = verificationCode;
+    user.verificationCodeExpiration = verificationCodeExpiration;
+    await user.save();
+
+    await sendCode({
+      lastName: user.lastName,
+      email: user.email,
+      verificationCode,
+      verificationCodeExpiration: '5 minutes',
+    });
+
+    res.status(201).json({
+      message: 'Verification code sent successfully',
+      email: user.email,
+      verificationCodeExpiration: '5 minutes',
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
 // @desc Verify user code
 // @route Post /api/users/verify
 // @Access Public
 const verifyCode = async (req, res, next) => {
   try {
-    const { email, verificationCode } = req.body;
+    const email = req.body.email;
+    const { error } = validateEmail({ email });
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
 
     const user = await User.findOne({
       email: email,
-      verificationCode: verificationCode,
+      verificationCode: req.body.verificationCode,
       verificationCodeExpiration: { $gt: Date.now() },
     });
 
@@ -258,6 +307,7 @@ const updateUserById = async (req, res, next) => {
 };
 
 module.exports.signupUser = signupUser;
+module.exports.sendVerificationCode = sendVerificationCode;
 module.exports.verifyCode = verifyCode;
 module.exports.getUserProfile = getUserProfile;
 module.exports.updateUserProfile = updateUserProfile;

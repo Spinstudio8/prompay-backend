@@ -6,13 +6,15 @@ const validate = require('../validations/questionValidation');
 // @access private/admin
 const addQuestion = async (req, res, next) => {
   try {
-    const { question, options, answer } = req.body;
+    const { question, options, answer, subject, description } = req.body;
 
     // Validate Question
     const { error } = validate({
       question,
       options,
       answer: parseInt(answer),
+      subject,
+      description,
     });
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
@@ -27,6 +29,8 @@ const addQuestion = async (req, res, next) => {
       question,
       options,
       answer: parseInt(answer),
+      subject,
+      description,
     });
 
     await questionObject.save();
@@ -43,13 +47,14 @@ const addQuestion = async (req, res, next) => {
 const editQuestion = async (req, res, next) => {
   try {
     const id = req.params.id;
-    const { question, options, answer } = req.body;
+    const { question, options, answer, description } = req.body;
 
     // Validate Question
     const { error } = validate({
       question,
       options,
       answer: parseInt(answer),
+      description,
     });
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
@@ -63,6 +68,7 @@ const editQuestion = async (req, res, next) => {
     questionObject.question = question;
     questionObject.answer = parseInt(answer);
     questionObject.options = options;
+    questionObject.description = description;
 
     await questionObject.save();
 
