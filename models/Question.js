@@ -7,7 +7,7 @@ const questionSchema = new Schema(
     options: [{ type: String, required: true }],
     answer: { type: Number, required: true },
     subject: { type: Schema.Types.ObjectId, ref: 'Subject', required: true },
-    description: { type: String, required: true },
+    description: { type: String },
   },
   { timestamps: true }
 );

@@ -30,6 +30,7 @@ const userSchema = new Schema(
       type: Date,
       required: true,
     },
+    imageUrl: { type: String },
     password: { type: String, required: true, minlength: 10, maxlength: 255 },
     totalScore: { type: Number, default: 0 },
     wallet: { type: Number, default: 0 },
@@ -39,6 +40,8 @@ const userSchema = new Schema(
     resetToken: { type: String },
     resetTokenExpiration: { type: Date },
     role: { type: String, default: 'user' },
+    isAdmin: { type: Boolean, default: false },
+    hasAuthority: { type: Boolean, default: false },
     assessments: [{ type: Schema.Types.ObjectId, ref: 'Assessment' }],
   },
   { timestamps: true }

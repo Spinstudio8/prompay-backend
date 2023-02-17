@@ -3,6 +3,7 @@ const Question = require('../models/Question');
 const Assessment = require('../models/Assessment');
 const Payment = require('../models/Payment');
 const validateAssessment = require('../validations/assessmentValidation');
+const { conn } = require('../db');
 
 // [
 //   { question: '27ge8yw7ee98w99ew', answer: 1, subject: 'yyw673262yg3g287' },
@@ -16,19 +17,26 @@ const validateAssessment = require('../validations/assessmentValidation');
 // @route Post /api/assessment/submit
 // @Access Public
 const submitAndCompute = async (req, res, next) => {
+  const session = await conn.startSession();
+
   try {
+    session.startTransaction();
+
     const { error } = validateAssessment(req.body);
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
 
     const assessmentData = req.body.assessmentData;
+    const totalQuestion = assessmentData.length;
 
     // Calculate the score for the assessment
     let score = 0;
     for (const answer of assessmentData) {
-      const question = await Question.findById(answer.questionId);
-      if (question?.answer === answer.answer) {
+      const question = await Question.findById(answer.question).session(
+        session
+      );
+      if (question?.answer == answer.answer) {
         score += 1;
         answer.correct = true;
       } else {
@@ -45,7 +53,7 @@ const submitAndCompute = async (req, res, next) => {
       score: score,
       amountEarned: paymentAmount,
     });
-    await assessment.save();
+    await assessment.save({ session });
 
     const payment = new Payment({
       user: req.user._id,
@@ -54,21 +62,27 @@ const submitAndCompute = async (req, res, next) => {
       status: 'successful',
       assessment: assessment._id,
     });
-    await payment.save();
+    await payment.save({ session });
 
-    // Update the user's points and wallet balance
+    // Update the user's score and wallet balance
     const user = await User.findById(req.user._id);
     user.totalScore += score;
     user.wallet += paymentAmount;
     user.assessments.push(assessment._id);
-    await user.save();
+    await user.save({ session });
 
-    res
-      .status(200)
-      .json({ message: 'Assessment submitted successfully', score: score });
+    await session.commitTransaction();
+    res.status(200).json({
+      message: 'Assessment submitted successfully',
+      score,
+      totalQuestion,
+    });
   } catch (err) {
     console.error(err);
+    await session.abortTransaction();
     next(err);
+  } finally {
+    session.endSession();
   }
 };
 
