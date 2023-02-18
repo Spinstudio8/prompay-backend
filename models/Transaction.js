@@ -6,7 +6,7 @@ const transactionSchema = new Schema({
   amount: { type: Number, required: true },
   type: {
     type: String,
-    enum: ['recharge card purchase', 'withdrawal'],
+    enum: ['recharge card purchase', 'withdrawal', 'payment from prompay'],
     required: true,
   },
   date: { type: Date, default: Date.now },

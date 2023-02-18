@@ -43,6 +43,8 @@ const userSchema = new Schema(
     isAdmin: { type: Boolean, default: false },
     hasAuthority: { type: Boolean, default: false },
     assessments: [{ type: Schema.Types.ObjectId, ref: 'Assessment' }],
+    transactions: [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
+    payments: [{ type: Schema.Types.ObjectId, ref: 'Payment' }],
   },
   { timestamps: true }
 );

@@ -1,5 +1,7 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
+const Assessment = require('../models/Assessment');
+const Subject = require('../models/Subject');
 const { sendCode } = require('../nodemailer/verificationMessage');
 const generateCode = require('../utils/generateCode');
 const { generateToken } = require('../utils/generateToken');
@@ -8,6 +10,7 @@ const {
   validateUserSignup,
   validateEmail,
 } = require('../validations/userValidation');
+const { response } = require('express');
 
 // @desc Signup user
 // @route Post /api/users/signup
@@ -209,6 +212,83 @@ const updateUserProfile = async (req, res, next) => {
   }
 };
 
+// @desc Get user dashboard
+// @route GET /api/users/:id/dashboard
+// @access Private
+const getUserDashboard = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id)
+      .select('-password -hasAuthority -__v')
+      .populate('assessments');
+    console.log(user);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const scoreInSubject = {};
+
+    // find all subject and initialize score to zero for all subjects
+    const subjects = await Subject.find({}).select(
+      '_id score title description'
+    );
+    for (const subject of subjects) {
+      scoreInSubject[subject._id] = 0;
+    }
+
+    // check correct score for each subject then add the score
+    for (const assessment of user.assessments) {
+      for (const answer of assessment.answers) {
+        if (answer.correct) {
+          scoreInSubject[answer.subject] = scoreInSubject[answer.subject] + 1;
+        }
+      }
+    }
+
+    // record the score for each subject in subjects array
+    for (const subject of subjects) {
+      subject.score = scoreInSubject[subject._id];
+      console.log(scoreInSubject[subject._id]);
+    }
+
+    console.log(subjects);
+
+    user.assessments = user.assessments.length;
+    res.json({
+      subjects: subjects,
+      assessmentsTaken: user.assessments.length,
+      wallet: user.wallet,
+      totalScore: user.totalScore,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// @desc Get user wallet information
+// @route GET /api/users/:id/wallet
+// @access Private
+const getUserWallet = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id)
+      .select('-password')
+      .populate(['transactions', 'payment']);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      wallet: user.wallet,
+      transactions: user.transactions,
+      payments: user.payments,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // @desc Get all users
 // @route GET /api/users
 // @access Private/Admin
@@ -311,6 +391,8 @@ module.exports.sendVerificationCode = sendVerificationCode;
 module.exports.verifyCode = verifyCode;
 module.exports.getUserProfile = getUserProfile;
 module.exports.updateUserProfile = updateUserProfile;
+module.exports.getUserDashboard = getUserDashboard;
+module.exports.getUserWallet = getUserWallet;
 module.exports.getUsers = getUsers;
 module.exports.deleteUser = deleteUser;
 module.exports.getUserById = getUserById;

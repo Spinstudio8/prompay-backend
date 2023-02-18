@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Question = require('../models/Question');
 const Assessment = require('../models/Assessment');
+const Transaction = require('../models/Transaction');
 const Payment = require('../models/Payment');
 const validateAssessment = require('../validations/assessmentValidation');
 const { conn } = require('../db');
@@ -44,7 +45,7 @@ const submitAndCompute = async (req, res, next) => {
       }
     }
 
-    // Save the assessment and payment data to the database
+    // Save the assessment, payment data and transaction data to the database
     const reward = 10; // 10 Naira per question
     const paymentAmount = score * reward;
     const assessment = new Assessment({
@@ -64,11 +65,21 @@ const submitAndCompute = async (req, res, next) => {
     });
     await payment.save({ session });
 
+    const transaction = new Transaction({
+      user: req.user._id,
+      amount: paymentAmount,
+      type: 'payment from prompay',
+      status: 'successful',
+    });
+    await transaction.save({ session });
+
     // Update the user's score and wallet balance
     const user = await User.findById(req.user._id);
     user.totalScore += score;
     user.wallet += paymentAmount;
     user.assessments.push(assessment._id);
+    user.transactions.push(transaction._id);
+    user.payments.push(payment._id);
     await user.save({ session });
 
     await session.commitTransaction();
