@@ -34,7 +34,7 @@ const protect = async (req, res, next) => {
 };
 
 const admin = (req, res, next) => {
-  if (req.user && req.user.isAdmin && req.user.hasPermission) {
+  if (req.user && req.user.isAdmin && req.user.hasAuthority) {
     next();
   } else {
     res.status(401).json({ message: 'Not auhtorized as an admin' });

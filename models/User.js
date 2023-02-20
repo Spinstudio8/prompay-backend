@@ -30,6 +30,7 @@ const userSchema = new Schema(
       type: Date,
       required: true,
     },
+    location: { type: String },
     imageUrl: { type: String },
     password: { type: String, required: true, minlength: 10, maxlength: 255 },
     totalScore: { type: Number, default: 0 },

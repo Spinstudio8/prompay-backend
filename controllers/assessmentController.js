@@ -83,7 +83,7 @@ const submitAndCompute = async (req, res, next) => {
     await user.save({ session });
 
     await session.commitTransaction();
-    res.status(200).json({
+    res.status(201).json({
       message: 'Assessment submitted successfully',
       score,
       totalQuestion,

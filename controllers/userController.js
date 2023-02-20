@@ -177,7 +177,6 @@ const updateUserProfile = async (req, res, next) => {
   try {
     const { error } = validateUserProfile(req.body);
     if (error) {
-      res.status(400);
       return res.status(400).json({ message: error.details[0].message });
     }
 

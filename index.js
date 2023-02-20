@@ -8,6 +8,7 @@ const questionRoutes = require('./routes/question');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const assessmentRoutes = require('./routes/assessment');
+const withdrawalRoutes = require('./routes/withdrawal');
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use('/api/questions', questionRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/assessment', assessmentRoutes);
+app.use('/api/withdrawals', withdrawalRoutes);
 
 //Error Handler
 app.use(errorHandler);

@@ -12,7 +12,7 @@ const transactionSchema = new Schema({
   date: { type: Date, default: Date.now },
   status: {
     type: String,
-    enum: ['successful', 'failed'],
+    enum: ['successful', 'failed', 'pending'],
     required: true,
   },
 });
