@@ -24,7 +24,7 @@ const userSchema = new Schema(
       maxlength: 50,
       unique: true,
     },
-    phone: { type: String, required: true, trim: true, unique: true },
+    phone: { type: String, required: true, unique: true },
     gender: { type: String, enum: ['male', 'female'], required: true },
     birthDay: {
       type: Date,

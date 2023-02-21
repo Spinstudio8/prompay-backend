@@ -7,6 +7,9 @@ const {
 } = require('../validations/withdrawalValidation');
 const { conn } = require('../db');
 const { response } = require('express');
+const {
+  sendSuccessfulWithdrawalMessage,
+} = require('../nodemailer/successfulWithdrawal');
 
 // @desc Withdraw earned money
 // @route POST /api/withdrawals
@@ -26,9 +29,7 @@ const withdrawal = async (req, res, next) => {
     const user = await User.findById(userId).session(session);
     // check if user have less than the withdrawal amount
     if (user.wallet < req.body.amount) {
-      return res
-        .status(400)
-        .json({ message: 'You have exceeded your wallet balance' });
+      return res.status(400).json({ message: 'Not enough balance' });
     }
     // deduct the amount
     user.wallet -= req.body.amount;
@@ -90,16 +91,29 @@ const processWithdrawal = async (req, res, next) => {
     if (!withdrawal) {
       return res.status(404).json({ message: 'Withdrawal not found' });
     }
+    if (withdrawal.status === 'successful') {
+      return res.status(400).json({ message: 'Withdrawal already processed' });
+    }
     withdrawal.status = req.body.action;
     await withdrawal.save({ session });
 
-    const transaction = await Transaction.findById(
-      withdrawal.transaction
-    ).session(session);
+    const transaction = await Transaction.findById(withdrawal.transaction)
+      .populate('user')
+      .session(session);
     transaction.status = req.body.action;
     await transaction.save({ session });
 
     await session.commitTransaction();
+
+    await sendSuccessfulWithdrawalMessage({
+      lastName: transaction.user.lastName,
+      email: transaction.user.email,
+      wallet: transaction.user.wallet,
+      amount: transaction.amount,
+      transactionId: transaction._id,
+      withdrawalId: withdrawal._id,
+    });
+
     res.status(200).json({
       message: 'Withdrawal completed',
       withdrawal: withdrawal,

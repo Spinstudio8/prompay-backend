@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Withdrawal</title>
+    <style>
+      .amount {
+        font-weight: 700;
+        font-size: 25px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Successful Withdrawal</h1>
+    <hr />
+    <br />
+    <p>Dear {{lastName}}</p>
+    <br />
+    <p>
+      You have successfully withdrawn the amount
+      <span class="amount">₦{{amount}}</span> from your wallet balance.
+    </p>
+    <p>Transaction id: {{transactionId}}</p>
+    <p>Withdrawal id: {{withdrawalId}}</p>
+    <p>New balance is <span class="amount">₦{{wallet}}</span>.</p>
+
+    <br />
+    <p>Best regards,</p>
+    <p>Wallet manager</p>
+    <p>Prompay</p>
+    <hr />
+    <p>Prompay, where the world learns to earn</p>
+  </body>
+</html>
