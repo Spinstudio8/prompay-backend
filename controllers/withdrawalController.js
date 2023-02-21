@@ -148,7 +148,7 @@ const getWithdrawals = async (req, res, next) => {
 // @desc Admin get withdrawal
 // @route GET /api/withdrawals/:id
 // @access Private/Admin
-const getWithdrawal = async (req, res, next) => {
+const getWithdrawalById = async (req, res, next) => {
   try {
     const withdrawal = await Withdrawal.findById(req.params.id);
     if (!withdrawal) {
@@ -164,4 +164,4 @@ const getWithdrawal = async (req, res, next) => {
 module.exports.withdrawal = withdrawal;
 module.exports.processWithdrawal = processWithdrawal;
 module.exports.getWithdrawals = getWithdrawals;
-module.exports.getWithdrawal = getWithdrawal;
+module.exports.getWithdrawalById = getWithdrawalById;

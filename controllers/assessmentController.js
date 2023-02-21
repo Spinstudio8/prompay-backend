@@ -6,6 +6,76 @@ const Payment = require('../models/Payment');
 const validateAssessment = require('../validations/assessmentValidation');
 const { conn } = require('../db');
 
+/*
+const currentAssessment = {
+  questions: questions,
+  startTime: Date.now(),
+  endTime: Date.now() + 3600000 + 60000, // 3,600,000 milliseconds = 1hour + 2min
+  nextAssessmentTime: Date.now() + 86400000, // 86,400,000 = 24hour
+}
+*/
+
+// @desc Start assessment by getting assessment questions
+// @route Get /api/assessment/start
+// @access Private
+const startAssessment = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    let currentAssessment = user.currentAssessment;
+    // check if user have an assessment to complete
+    if (user.hasAssessment && currentAssessment.endTime > Date.now()) {
+      // set a new start time
+      currentAssessment.startTime = Date.now();
+      user.currentAssessment = currentAssessment;
+      await user.save();
+
+      return res.json({
+        startTime: currentAssessment.startTime,
+        endTime: currentAssessment.endTime,
+        questions: currentAssessment.questions,
+      });
+    }
+
+    const nextAssessmentTime = currentAssessment?.nextAssessmentTime
+      ? currentAssessment.nextAssessmentTime
+      : 0;
+    // Send questions only if next assessment time has elapsed
+    if (Date.now() > nextAssessmentTime) {
+      const questions = await Question.aggregate([
+        { $sample: { size: 5 } },
+        {
+          $lookup: {
+            from: 'subjects',
+            localField: 'subject',
+            foreignField: '_id',
+            as: 'subject',
+          },
+        },
+        { $unwind: '$subject' },
+        { $addFields: { subject: '$subject' } },
+        { $project: { answer: 0, __v: 0 } },
+      ]);
+
+      currentAssessment = {
+        questions: questions,
+        startTime: Date.now(),
+        endTime: Date.now() + 3600000 + 180000, // 3,600,000 milliseconds = 1hour + 3min
+        nextAssessmentTime: Date.now() + 86400000, // 86,400,000 = 24hour
+      };
+      user.currentAssessment = currentAssessment;
+      user.hasAssessment = true;
+      await user.save();
+
+      currentAssessment.nextAssessmentTime = undefined;
+      res.json(currentAssessment);
+    } else {
+      res.status(403).json({ message: 'Try again later' });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 // [
 //   { question: '27ge8yw7ee98w99ew', answer: 1, subject: 'yyw673262yg3g287' },
 //   { question: '27ge8yw7ee98339ew', answer: 2, subject: 'yyw673262113g287' },
@@ -14,9 +84,9 @@ const { conn } = require('../db');
 //   { question: '27ge8yw7ee98ww9ew', answer: 3, subject: 'yyw673262893g287' },
 // ];
 
-// @desc Submit and
+// @desc Submit and compute assessment result
 // @route Post /api/assessment/submit
-// @Access Public
+// @Access Private
 const submitAndCompute = async (req, res, next) => {
   const session = await conn.startSession();
 
@@ -26,6 +96,17 @@ const submitAndCompute = async (req, res, next) => {
     const { error } = validateAssessment(req.body);
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
+    }
+
+    const user = await User.findById(req.user._id);
+    // if assessment end time has elapsed
+    if (
+      user.hasAssessment &&
+      Date.now() > user.currentAssessment.endTime + 240000 // + 4 minutes more
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Timeout! Couldn't submit assessment." });
     }
 
     const assessmentData = req.body.assessmentData;
@@ -74,12 +155,13 @@ const submitAndCompute = async (req, res, next) => {
     await transaction.save({ session });
 
     // Update the user's score and wallet balance
-    const user = await User.findById(req.user._id);
     user.totalScore += score;
     user.wallet += paymentAmount;
     user.assessments.push(assessment._id);
     user.transactions.push(transaction._id);
     user.payments.push(payment._id);
+    user.hasAssessment = false;
+    user.currentAssessment = {};
     await user.save({ session });
 
     await session.commitTransaction();
@@ -97,4 +179,5 @@ const submitAndCompute = async (req, res, next) => {
   }
 };
 
+module.exports.startAssessment = startAssessment;
 module.exports.submitAndCompute = submitAndCompute;

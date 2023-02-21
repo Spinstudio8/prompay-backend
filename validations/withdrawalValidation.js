@@ -1,8 +1,14 @@
 const Joi = require('joi');
 
+// Define the enum values
+const typeEnum = ['bank', 'cryptocurrency'];
+
 function validateWithdrawal(info) {
   const schema = Joi.object({
-    type: Joi.string().min(2).max(50).required().label('Withdrawal type'),
+    type: Joi.string()
+      .valid(...typeEnum)
+      .required()
+      .label('Withdrawal type'),
     bankName: Joi.string().min(2).max(50).required().label('Bank name'),
     accountNumber: Joi.string()
       .min(10)
@@ -16,9 +22,15 @@ function validateWithdrawal(info) {
   return schema.validate(info);
 }
 
+// Define the enum values
+const actionsEnum = ['successful', 'failed', 'pending'];
+
 function validateWithdrawalAction(info) {
   const schema = Joi.object({
-    action: Joi.string().required().label('Withdrawal type'),
+    action: Joi.string()
+      .valid(...actionsEnum)
+      .required()
+      .label('Withdrawal type'),
   });
 
   return schema.validate(info);

@@ -6,7 +6,7 @@ const withdrawalSchema = new Schema(
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     type: {
       type: String,
-      enum: ['bank', 'crypto'],
+      enum: ['bank', 'cryptocurrency'],
       required: true,
     },
     bankName: { type: String, required: true },

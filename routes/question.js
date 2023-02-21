@@ -6,12 +6,16 @@ const {
   deleteQuestion,
   getQuestion,
 } = require('../controllers/questionController');
+const { protect, admin } = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
-router.route('/').post(addQuestion).get(getQuestions);
-router.get('/:id', getQuestion);
-router.patch('/:id/edit', editQuestion);
-router.delete('/:id/delete', deleteQuestion);
+router
+  .route('/')
+  .post(protect, admin, addQuestion)
+  .get(protect, admin, getQuestions);
+router.get('/:id', protect, admin, getQuestion);
+router.patch('/:id/edit', protect, admin, editQuestion);
+router.delete('/:id/delete', protect, admin, deleteQuestion);
 
 module.exports = router;

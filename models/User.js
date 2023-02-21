@@ -46,6 +46,8 @@ const userSchema = new Schema(
     assessments: [{ type: Schema.Types.ObjectId, ref: 'Assessment' }],
     transactions: [{ type: Schema.Types.ObjectId, ref: 'Transaction' }],
     payments: [{ type: Schema.Types.ObjectId, ref: 'Payment' }],
+    hasAssessment: { type: Boolean, default: false },
+    currentAssessment: { type: Object },
   },
   { timestamps: true }
 );

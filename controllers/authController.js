@@ -8,13 +8,13 @@ const { validateUserLogin } = require('../validations/userValidation');
 // @Access Public
 const loginUser = async (req, res, next) => {
   try {
-    let { email, password } = req.body;
-
     // Validation
-    const { error } = validateUserLogin({ email, password });
+    const { error } = validateUserLogin(req.body);
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
+
+    let { email, password } = req.body;
 
     email = email.toLowerCase();
     // Find user by email
@@ -46,7 +46,7 @@ const loginUser = async (req, res, next) => {
       user.role
     );
 
-    res.status(201).json({
+    res.status(200).json({
       token: token,
     });
   } catch (error) {

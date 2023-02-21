@@ -9,6 +9,7 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const assessmentRoutes = require('./routes/assessment');
 const withdrawalRoutes = require('./routes/withdrawal');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/assessment', assessmentRoutes);
 app.use('/api/withdrawals', withdrawalRoutes);
+app.use('/api/admin', adminRoutes);
 
 //Error Handler
 app.use(errorHandler);

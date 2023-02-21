@@ -17,22 +17,14 @@ const { response } = require('express');
 // @Access Public
 const signupUser = async (req, res, next) => {
   try {
-    let { firstName, lastName, email, phone, birthDay, gender, password } =
-      req.body;
-
     // Validation
-    const { error } = validateUserSignup({
-      firstName,
-      lastName,
-      email,
-      phone,
-      birthDay,
-      gender,
-      password,
-    });
+    const { error } = validateUserSignup(req.body);
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
+
+    let { firstName, lastName, email, phone, birthDay, gender, password } =
+      req.body;
 
     email = email.toLowerCase();
     // check if a user with the same email already exists
@@ -185,6 +177,7 @@ const updateUserProfile = async (req, res, next) => {
     if (user) {
       user.firstName = req.body.firstName;
       user.lastName = req.body.lastName;
+      user.location = req.body.location;
 
       const updatedUser = await user.save();
 
@@ -217,7 +210,7 @@ const updateUserProfile = async (req, res, next) => {
 const getUserDashboard = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id)
-      .select('-password -hasAuthority -__v')
+      .select('-password -hasAuthority -__v -isAdmin')
       .populate('assessments');
     console.log(user);
 
@@ -289,29 +282,20 @@ const getUserWallet = async (req, res, next) => {
 };
 
 // @desc Get all users
-// @route GET /api/users
+// @route GET /api/users?pageSize=10&pageNumber=1
 // @access Private/Admin
 const getUsers = async (req, res, next) => {
   try {
-    const pageSize = 10;
+    const pageSize = Number(req.query.pageSize) || 10;
     const page = Number(req.query.pageNumber) || 1;
 
     const count = await User.countDocuments({});
     const users = await User.find({})
-      .select('-password -isAdmin -__v')
+      .select('-password -__v')
       .limit(pageSize)
       .skip(pageSize * (page - 1));
 
-    serialNumbers = [];
-    let number = 1;
-    for (let i = 0; i < users.length; i++) {
-      // give each user sequencial number
-      serialNumbers.push(number + pageSize * (page - 1));
-      number = number + 1;
-    }
-
     res.json({
-      serialNumbers,
       users,
       page,
       pages: Math.ceil(count / pageSize),
@@ -372,6 +356,10 @@ const updateUserById = async (req, res, next) => {
       user.firstName = req.body.firstName;
       user.lastName = req.body.lastName;
       user.role = req.body.role;
+      user.isAdmin = req.body.isAdmin;
+      user.hasAuthority = req.body.hasAuthority;
+      user.gender = req.body.gender;
+      user.location = req.body.location;
 
       const updatedUser = await user.save();
       user.password = '';

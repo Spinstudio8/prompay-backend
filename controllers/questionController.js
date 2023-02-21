@@ -1,4 +1,5 @@
 const Question = require('../models/Question');
+const User = require('../models/User');
 const validate = require('../validations/questionValidation');
 
 // @desc Add a new Question
@@ -125,13 +126,13 @@ const deleteQuestion = async (req, res, next) => {
   }
 };
 
-// // @desc Get Question
-// // @route Get /api/questions/:id
-// // @access private/admin
-// const getQuestion = async (req, res, next) => {
+// const getAssessmentQuestions = async (req, res, next) => {
 //   try {
-//     const id = req.params.id;
-//     const question = await Question.findById(id);
+//     const questions = await Question.aggregate([
+//       { $group: { _id: "$_id", question: { $first: "$$ROOT" } } },
+//       { $sample: { size: 200 } },
+//       { $replaceRoot: { newRoot: "$question" } }
+//     ]);
 
 //     res.json(questions);
 //   } catch (error) {
