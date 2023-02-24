@@ -9,8 +9,8 @@ const {
   validateUserProfile,
   validateUserSignup,
   validateEmail,
+  adminValidateUserProfile,
 } = require('../validations/userValidation');
-const { response } = require('express');
 
 // @desc Signup user
 // @route Post /api/users/signup
@@ -20,6 +20,14 @@ const signupUser = async (req, res, next) => {
     // Validation
     const { error } = validateUserSignup(req.body);
     if (error) {
+      // if it is the regex pattern
+      if (error.details[0].context?.regex) {
+        return res.status(400).json({
+          message:
+            'Password must contain at least one uppercase, lowercase, number and special character',
+        });
+      }
+
       return res.status(400).json({ message: error.details[0].message });
     }
 
@@ -28,9 +36,15 @@ const signupUser = async (req, res, next) => {
 
     email = email.toLowerCase();
     // check if a user with the same email already exists
-    const existingUser = await User.findOne({ email: email });
+    let existingUser = await User.findOne({ email: email });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exist' });
+    }
+
+    // check if a user with the same phone number already exists
+    existingUser = await User.findOne({ phone: phone });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Phone number taken' });
     }
 
     // hash the password
@@ -65,7 +79,7 @@ const signupUser = async (req, res, next) => {
     res.status(201).json({
       message: 'Verification code sent successfully',
       email,
-      verificationCodeExpiration: '5 minutes',
+      verificationCodeExpiration: 300000, // 300,000ms = '5 minutes'
     });
   } catch (error) {
     console.log(error);
@@ -73,10 +87,10 @@ const signupUser = async (req, res, next) => {
   }
 };
 
-// @desc Send user verification code
-// @route Post /api/users/verification-code
+// @desc Resend user verification code
+// @route Post /api/users/resend-verification-code
 // @Access Public
-const sendVerificationCode = async (req, res, next) => {
+const resendVerificationCode = async (req, res, next) => {
   try {
     const { error } = validateEmail(req.body);
     if (error) {
@@ -106,7 +120,7 @@ const sendVerificationCode = async (req, res, next) => {
     res.status(201).json({
       message: 'Verification code sent successfully',
       email: user.email,
-      verificationCodeExpiration: '5 minutes',
+      verificationCodeExpiration: 300000, // 300,000ms = '5 minutes'
     });
   } catch (err) {
     console.log(err);
@@ -115,7 +129,7 @@ const sendVerificationCode = async (req, res, next) => {
 };
 
 // @desc Verify user code
-// @route Post /api/users/verify
+// @route Post /api/users/verify-code
 // @Access Public
 const verifyCode = async (req, res, next) => {
   try {
@@ -134,7 +148,7 @@ const verifyCode = async (req, res, next) => {
     if (!user) {
       return res
         .status(400)
-        .json({ message: 'Invalid code. Request a new code.' });
+        .json({ message: 'Invalid code. Click resend below.' });
     }
 
     user.isVerified = true;
@@ -153,7 +167,9 @@ const verifyCode = async (req, res, next) => {
 // @route GET /api/users/:id/profile
 // @access Private
 const getUserProfile = async (req, res) => {
-  const user = await User.findById(req.params.id).select('-password -__v');
+  const user = await User.findById(req.params.id).select(
+    '-password -__v -currentAssessment'
+  );
 
   if (user) {
     res.json(user);
@@ -210,7 +226,7 @@ const updateUserProfile = async (req, res, next) => {
 const getUserDashboard = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id)
-      .select('-password -hasAuthority -__v -isAdmin')
+      .select('-password -hasAuthority -__v -isAdmin -currentAssessment')
       .populate('assessments');
     console.log(user);
 
@@ -323,7 +339,7 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
-// @desc Get user by ID
+// @desc Admin get user by ID
 // @route GET /api/users/:id
 // @access Private/Admin
 const getUserById = async (req, res, next) => {
@@ -340,7 +356,7 @@ const getUserById = async (req, res, next) => {
   }
 };
 
-// @desc Update user by ID
+// @desc Admin update user by ID
 // @route Patch /api/users/:id
 // @access Private/Admin
 const updateUserById = async (req, res, next) => {
@@ -374,7 +390,7 @@ const updateUserById = async (req, res, next) => {
 };
 
 module.exports.signupUser = signupUser;
-module.exports.sendVerificationCode = sendVerificationCode;
+module.exports.resendVerificationCode = resendVerificationCode;
 module.exports.verifyCode = verifyCode;
 module.exports.getUserProfile = getUserProfile;
 module.exports.updateUserProfile = updateUserProfile;

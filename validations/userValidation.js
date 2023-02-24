@@ -14,7 +14,14 @@ function validateUserSignup(user) {
       .valid(...genderEnum)
       .required()
       .label('Gender'),
-    password: Joi.string().min(10).max(16).required().label('Password'),
+    password: Joi.string()
+      .min(10)
+      .max(16)
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+      )
+      .required()
+      .label('Password'),
   });
 
   return schema.validate(user);
@@ -41,7 +48,7 @@ function validateUserProfile(user) {
   const schema = Joi.object({
     firstName: Joi.string().min(2).max(50).required().label('First name'),
     lastName: Joi.string().min(2).max(50).required().label('Last name'),
-    location: Joi.string().min(2).max(50).label('Location'),
+    location: Joi.string().min(2).max(50).required().label('Location'),
   });
 
   return schema.validate(user);

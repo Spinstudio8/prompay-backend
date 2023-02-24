@@ -4,7 +4,7 @@ const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
 
 const filePath = path.join(__dirname, '../views', 'verification-message.html');
-let html = fs.readFileSync(filePath, 'utf-8');
+let htmlFile = fs.readFileSync(filePath, 'utf-8');
 
 const user = process.env.GOOGLE_USER;
 const pass = process.env.GOOGLE_PASS;
@@ -27,7 +27,7 @@ const sendCode = async ({
   verificationCodeExpiration,
 }) => {
   // Replace placeholders with values from the request body
-  html = html
+  const html = htmlFile
     .replace(/{{lastName}}/g, lastName)
     .replace(/{{email}}/g, email)
     .replace(/{{verificationCode}}/g, verificationCode)

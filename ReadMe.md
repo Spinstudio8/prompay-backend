@@ -1,142 +1,76 @@
-# Origin: https://github.com
+# NodeJS Application Documentation
 
-# 1. POST /api/users/signup
-
-Description:
-This route allows a user to sign up for the service by providing their personal details and creating a new account.
-
-Access:
-Public
-
-Request Body:
-The request body must contain the following fields:
-- firstName (string, required, min length 2, max length 50): the user's first name
-- lastName (string, required, min length 2, max length 50): the user's last name
-- email (string, required, max length 50, unique): the user's email address, which must be unique to create a new account
-- phone (string, required, unique): the user's phone number, which must be unique to create a new account
-- birthDay (date, required): the user's birth day
-- gender (string, required, enum ['male', 'female']): the user's gender, which must be one of the specified enum values
-- password (string, required, min length 10, max length 255): the user's chosen password
-
-Response:
-- If the request body is invalid, the server will respond with a 400 status code and an error message.
-- If the user with the given email already exists, the server will respond with a 400 status code and an error message.
-- If the user is successfully created, the server will respond with a 201 status code and a success message. Additionally, a verification code will be sent to the user's email address, which they can use to verify their account.
-  - Response Body:
-    - message (string): a success message indicating that the verification code was sent successfully
-    - email (string): the user's email address
-    - verificationCodeExpiration (string): the expiration time for the verification code, which is set to 5 minutes
-- If an error occurs while processing the request, the server will respond with an error message and an appropriate status code.
-
-Example Request:
-# POST /api/users/signup
-Content-Type: application/json
-
-{
-    "firstName": "John",
-    "lastName": "Doe",
-    "email": "johndoe@example.com",
-    "phone": "1234567890",
-    "birthDay": "1990-01-01",
-    "gender": "male",
-    "password": "secretpassword"
-}
-
-Example Response:
-HTTP/1.1 201 Created
-Content-Type: application/json
-
-{
-    "message": "Verification code sent successfully",
-    "email": "johndoe@example.com",
-    "verificationCodeExpiration": "5 minutes"
-}
+/*
+* This is the documentation for a NodeJS application that uses the following        technologies:
 
 
-# 2. POST /api/auth/login
+*/
 
-/**
- * @openapi
- * tags:
- *   name: Authentication
- *   description: APIs for user authentication
- *
- * /api/auth/login:
- *   post:
- *     summary: Login user with email and password
- *     tags: [Authentication]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 format: email
- *                 description: User's email address
- *                 example: user@example.com
- *               password:
- *                 type: string
- *                 description: User's password
- *                 example: password123
- *             required:
- *               - email
- *               - password
- *     responses:
- *       201:
- *         description: JSON Web Token generated successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *                   description: JSON Web Token
- *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
- *       400:
- *         description: Invalid user input
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Error message
- *                   example: "email" is not allowed to be empty
- *       401:
- *         description: Unauthorized access
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Error message
- *                   example: Invalid email or password
- *                 isVerified:
- *                   type: boolean
- *                   description: User verification status
- *                   example: false
- *                 email:
- *                   type: string
- *                   format: email
- *                   description: User's email address
- *                   example: user@example.com
- *       500:
- *         description: Server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Error message
- *                   example: Internal Server Error
- */
+# MongoDB for database storage
+# Express for handling HTTP requests and responses
+# Mongoose for object modeling with MongoDB
+# Cors for Cross-Origin Resource Sharing
+# Dotenv for handling environment variables
 
+
+Dependencies
+This application has the following dependencies:
+
+mongoose
+cors
+express
+dotenv
+Files and Folders
+The application has the following files and folders:
+
+index.js: The main entry point of the application that starts the server
+db.js: The file that connects to the MongoDB database and exports the connection
+middlewares/errorMiddleware.js: The file that contains custom error handling middleware functions
+routes/: The folder that contains all the route files
+routes/root.js: The file that handles the root route
+routes/question.js: The file that handles the /api/questions route
+routes/auth.js: The file that handles the /api/auth route
+routes/user.js: The file that handles the /api/users route
+routes/assessment.js: The file that handles the /api/assessment route
+routes/withdrawal.js: The file that handles the /api/withdrawals route
+routes/admin.js: The file that handles the /api/admin route
+Entry Point
+The index.js file is the main entry point of the application. It does the following:
+
+Imports the required dependencies and files
+Sets the strictQuery option of Mongoose to true
+Defines a function mongodb that connects to the MongoDB database using the MONGO_URI environment variable and exports it
+Defines an instance of the express application and sets up middleware for handling form data and JSON
+Defines middleware for Cross-Origin Resource Sharing (CORS)
+Defines routes for the application
+Defines error handling middleware functions
+Calls the mongodb function to connect to the database
+Starts the server on the specified port (either the PORT environment variable or port 6001)
+Database Connection
+The db.js file connects to the MongoDB database using Mongoose. It exports a conn object that represents the connection.
+
+Middleware
+Error Handling Middleware
+The middlewares/errorMiddleware.js file defines two custom error handling middleware functions:
+
+notFound: This middleware handles 404 errors when a route is not found
+errorHandler: This middleware handles all other errors and sends an error response to the client
+Routes
+The application has the following routes:
+
+Root Route (/)
+GET /: Returns a JSON object with a message indicating that the API is running
+Question Routes (/api/questions)
+GET /: Returns an array of all questions
+GET /:id: Returns a question with the specified id
+POST /: Creates a new question with the provided data
+PUT /:id: Updates a question with the specified id with the provided data
+DELETE /:id: Deletes a question with the specified id
+Authentication Routes (/api/auth)
+POST /register: Registers a new user with the provided data
+POST /login: Authenticates a user with the provided data and returns a JSON Web Token (JWT)
+User Routes (/api/users)
+GET /: Returns an array of all users
+GET /:id: Returns a user with the specified id
+PUT /:id: Updates a user with the specified id with the provided data
+`DELETE

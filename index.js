@@ -44,6 +44,15 @@ app.use('/api/admin', adminRoutes);
 app.use(errorHandler);
 app.use(notFound);
 
+// Helmet for security purposes. Compression for efficiency
+app.use(helmet());
+app.use(
+  compression({
+    level: 6,
+    threshold: 0,
+  })
+);
+
 // connect to mongodb
 mongodb();
 

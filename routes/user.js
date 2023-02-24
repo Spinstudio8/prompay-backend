@@ -1,7 +1,7 @@
 const express = require('express');
 const {
   signupUser,
-  sendVerificationCode,
+  resendVerificationCode,
   getUserProfile,
   updateUserProfile,
   getUserDashboard,
@@ -17,8 +17,8 @@ const { protect, admin } = require('../middlewares/authMiddleware');
 const router = express.Router();
 
 router.post('/signup', signupUser);
-router.post('/verification-code', sendVerificationCode);
-router.post('/verify', verifyCode);
+router.post('/resend-verification-code', resendVerificationCode);
+router.post('/verify-code', verifyCode);
 router
   .route('/:id/profile')
   .get(protect, getUserProfile)

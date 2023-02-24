@@ -1,0 +1,773 @@
+openapi: 3.0.0
+info:
+  title: User APIs
+  description: User APIs for interacting with the database
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api
+
+paths:
+  /users/signup:
+    post:
+      summary: Signup a user and generate a verification code
+      operationId: signupUser
+      tags:
+        - users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  minLength: 2
+                  maxLength: 50
+                  example: John
+                lastName:
+                  type: string
+                  minLength: 2
+                  maxLength: 50
+                  example: Doe
+                email:
+                  type: string
+                  maxLength: 50
+                  format: email
+                  example: john.doe@example.com
+                phone:
+                  type: string
+                  example: +1234567890
+                birthDay:
+                  type: string
+                  format: date
+                  example: 1990-01-01
+                gender:
+                  type: string
+                  enum:
+                    - male
+                    - female
+                  example: male
+                password:
+                  type: string
+                  minLength: 10
+                  maxLength: 16
+                  example: P@ssw0rd
+              required:
+                - firstName
+                - lastName
+                - email
+                - phone
+                - birthDay
+                - gender
+                - password
+      responses:
+        '201':
+          description: Verification code sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Verification code sent successfully
+                  email:
+                    type: string
+                    format: email
+                    example: john.doe@example.com
+                  verificationCodeExpiration:
+                    type: integer
+                    example: 300000
+        '400':
+          description: Bad request, validation failed or user already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: First name is required
+
+  /users/verify-code:
+    post:
+      summary: Verify user code
+      description: Verify user code for account verification
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: The email of the user to be verified
+                  example: user@example.com
+                verificationCode:
+                  type: string
+                  description: The verification code to verify the user account
+                  example: 1234
+              required:
+                - email
+                - verificationCode
+      responses:
+        '200':
+          description: Successful response after verifying user code
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: A message confirming the successful verification
+                    example: Verification successful.
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: An error message detailing the issue
+                    example: Invalid code. Request a new code.
+
+  /users/resend-verification-code:
+    post:
+      summary: Resend user verification code
+      description: Resends the verification code to the user with the provided email.
+      tags:
+        - User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: User's email address
+                  example: user@example.com
+              required:
+                - email
+      responses:
+        '201':
+          description: Verification code sent successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: A message indicating the status of the request
+                    example: Verification code sent successfully
+                  email:
+                    type: string
+                    format: email
+                    description: User's email address
+                    example: user@example.com
+                  verificationCodeExpiration:
+                    type: integer
+                    description: Expiration time of the verification code in milliseconds
+                    example: 300000
+        '400':
+          description: Bad request. Invalid email or missing email parameter.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message indicating the cause of the error
+                    example: email is required
+        '404':
+          description: User not found. User with the provided email address not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message indicating the cause of the error
+                    example: User not found
+
+  /users/{id}/profile:
+    get:
+      summary: Get user profile
+      description: Returns the user profile for the specified user ID.
+      operationId: getUserProfile
+      tags:
+        - Users
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+        - in: header
+          name: Authorization
+          description: JWT token in the format `Bearer {token}`
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful operation. Returns the user profile for the specified user ID.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized. Token is missing or invalid.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+        "404":
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    
+    patch:
+      summary: Update user profile
+      description: Updates the profile of the user with the specified ID
+      operationId: updateUserProfile
+      tags:
+        - users
+      parameters:
+        - in: path
+          name: id
+          description: ID of the user to update
+          required: true
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+        - in: header
+          name: Authorization
+          description: JWT token in the format `Bearer {token}`
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: User profile data
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  minLength: 2
+                  maxLength: 50
+                lastName:
+                  type: string
+                  minLength: 2
+                  maxLength: 50
+                location:
+                  type: string
+                  minLength: 2
+                  maxLength: 50
+              required:
+                - firstName
+                - lastName
+                - location
+      responses:
+        '200':
+          description: User profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    description: ID of the updated user
+                  firstName:
+                    type: string
+                    description: First name of the updated user
+                  lastName:
+                    type: string
+                    description: Last name of the updated user
+                  email:
+                    type: string
+                    description: Email of the updated user
+                  role:
+                    type: string
+                    description: Role of the updated user
+                  token:
+                    type: string
+                    description: JWT token for the updated user
+        '400':
+          description: Bad request - invalid input data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+        '401':
+          description: Unauthorized - invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+
+    securitySchemes:
+      BearerAuth:
+        type: http
+        scheme: bearer
+        bearerFormat: JWT
+
+  /api/users/:id/dashboard:
+    get:
+      summary: Retrieves user dashboard
+      description: Retrieves the user dashboard, including subjects and scores.
+      tags:
+        - users 
+      parameters:
+        - name: id
+          in: path
+          description: ID of the user.
+          required: true
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+        - in: header
+          name: Authorization
+          description: JWT token in the format `Bearer {token}`
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Empty request body
+        required: false
+      responses:
+        '200':
+          description: Returns the user dashboard with scores for each subject.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subjects:
+                    type: array
+                    description: List of subjects with scores.
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          description: ID of the subject.
+                        score:
+                          type: number
+                          description: Score for the subject.
+                        title:
+                          type: string
+                          description: Title of the subject.
+                        description:
+                          type: string
+                          description: Description of the subject.
+                  assessmentsTaken:
+                    type: number
+                    description: Number of assessments taken by the user.
+                  wallet:
+                    type: number
+                    description: Amount of money in user's wallet.
+                  totalScore:
+                    type: number
+                    description: Total score of the user.
+                  firstName:
+                    type: string
+                    description: First name of the user.
+                  lastName:
+                    type: string
+                    description: Last name of the user.
+        '404':
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message for not found user.
+
+  /api/users/{id}/wallet:
+    get:
+      summary: Get user wallet information
+      description: Returns the wallet information, transactions and payments of the specified user
+      tags:
+        - users
+      parameters:
+        - in: path
+          name: id
+          description: User ID
+          required: true
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+        - in: header
+          name: Authorization
+          description: JWT token in the format `Bearer {token}`
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  wallet:
+                    type: number
+                  transactions:
+                    type: array
+                    items:
+                      type: object
+                    description: User's transactions
+                  payments:
+                    type: array
+                    items:
+                      type: object
+                    description: User's payments
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+
+  /users:
+    get:
+      summary: Admin get all users
+      description: Get all users with pagination and authentication, accessible only to authenticated users with admin access.
+      parameters:
+        - name: pageSize
+          in: query
+          description: Number of users to return per page
+          schema:
+            type: integer
+            default: 10
+        - name: pageNumber
+          in: query
+          description: Page number to return
+          schema:
+            type: integer
+            default: 1
+      security:
+        - bearerAuth: []
+        - in: header
+          name: Authorization
+          description: JWT token in the format `Bearer {token}`
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                        name:
+                          type: string
+                        email:
+                          type: string
+                        isAdmin:
+                          type: boolean
+                        hasAuthority:
+                          type: boolean
+                        createdAt:
+                          type: string
+                          format: date-time
+                        updatedAt:
+                          type: string
+                          format: date-time
+                      required:
+                        - _id
+                        - name
+                        - email
+                        - isAdmin
+                        - hasAuthority
+                        - createdAt
+                        - updatedAt
+                  page:
+                    type: integer
+                  pages:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/users/{id}/delete:
+    delete:
+      summary: Admin delete user by ID
+      description: Deletes the user with the specified ID, accessible only to authenticated users with admin access.
+      tags:
+        - users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the user to delete.
+      security:
+        - bearerAuth: []
+        - in: header
+          name: Authorization
+          description: JWT token in the format `Bearer {token}`
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  example:
+                    message: User successfuly removed
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  example:
+                    message: User not found
+    securitySchemes:
+      bearerAuth:
+        type: http
+        scheme: bearer
+        bearerFormat: JWT
+
+
+  /api/users/{id}:
+    get:
+      summary: Admin get user by ID
+      description: Retrieves the user with the specified ID, accessible only to authenticated users with admin access
+      tags:
+        - users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the user to retrieve.
+      security:
+        - bearerAuth: []
+        - in: header
+          name: Authorization
+          description: JWT token in the format `Bearer {token}`
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: 5c8e0e5b0190b214360dc032
+                  name:
+                    type: string
+                    example: John Doe
+                  email:
+                    type: string
+                    example: johndoe@example.com
+                  isAdmin:
+                    type: boolean
+                    example: true
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: 2019-03-17T14:35:20.662Z
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    example: 2020-02-25T19:12:37.769Z
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  example:
+                    message: User not found
+    patch:
+      summary: Admin Update User by ID
+      description: Updates a user's profile by their ID, accessible only to authenticated users with admin access
+      tags:
+        - users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The ID of the user to update
+        - in: body
+          name: user
+          required: true
+          description: The user object containing the fields to update
+          schema:
+            type: object
+            properties:
+              firstName:
+                type: string
+                minLength: 2
+                maxLength: 50
+                example: John
+              lastName:
+                type: string
+                minLength: 2
+                maxLength: 50
+                example: Doe
+              role:
+                type: string
+                minLength: 2
+                example: Admin
+              gender:
+                type: string
+                enum: ['male', 'female', 'other']
+                example: male
+              location:
+                type: string
+                minLength: 2
+                maxLength: 50
+                example: Lagos, Nigeria
+              isAdmin:
+                type: boolean
+                example: true
+              hasAuthority:
+                type: boolean
+                example: false
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: 5c8e0e5b0190b214360dc032
+                  firstName:
+                    type: string
+                    example: John
+                  lastName:
+                    type: string
+                    example: Doe
+                  email:
+                    type: string
+                    example: johndoe@example.com
+                  role:
+                    type: string
+                    example: Admin
+                  gender:
+                    type: string
+                    enum: ['male', 'female', 'other']
+                    example: male
+                  location:
+                    type: string
+                    example: Lagos, Nigeria
+                  isAdmin:
+                    type: boolean
+                    example: true
+                  hasAuthority:
+                    type: boolean
+                    example: false
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "First name is required"
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User not found"
+
+    securitySchemes:
+      bearerAuth:
+        type: http
+        scheme: bearer
+        bearerFormat: JWT
+

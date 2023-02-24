@@ -1,0 +1,85 @@
+openapi: 3.0.0
+info:
+  title: Login API
+  description: API for logging in a user
+  version: 1.0.0
+servers:
+  - url: http://localhost:3001/api
+paths:
+  /auth/login:
+    post:
+      summary: Logs in a user
+      description: Authenticates a user with their email and password and generates a JSON Web Token
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: The user's email address
+                  example: johndoe@example.com
+                password:
+                  type: string
+                  description: The user's password
+                  example: mypassword123
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: The JSON Web Token for the authenticated user
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxMjM0NTY3ODkwIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        "400":
+          description: Bad Request - Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message for the validation error
+                    example: "Validation error: 'email' must be a valid email address"
+        "401":
+          description: Unauthorized - Invalid email or password or account is not verified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message for the unauthorized access
+                    example: "Invalid email or password"
+                  isVerified:
+                    type: boolean
+                    description: Whether the account is verified or not
+                    example: false
+                  email:
+                    type: string
+                    format: email
+                    description: The email address of the user
+                    example: johndoe@example.com
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The error message for the server error
+                    example: "Internal Server Error - Something went wrong"
+      tags:
+        - Authentication
