@@ -13,6 +13,7 @@ const assessmentRoutes = require('./routes/assessment');
 const withdrawalRoutes = require('./routes/withdrawal');
 const adminRoutes = require('./routes/admin');
 
+// THE APP
 const app = express();
 
 if (!process.env.JWT_SECRET) {
