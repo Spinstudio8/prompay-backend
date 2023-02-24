@@ -1,5 +1,7 @@
 require('dotenv').config();
 const cors = require('cors');
+const helmet = require('helmet');
+const compression = require('compression');
 const express = require('express');
 const { mongodb } = require('./db');
 const { errorHandler, notFound } = require('./middlewares/errorMiddleware');
