@@ -11,6 +11,9 @@ const {
   validateEmail,
   adminValidateUserProfile,
 } = require('../validations/userValidation');
+const {
+  sendSuccessfulVerificationMessage,
+} = require('../nodemailer/successfulVerification');
 
 // @desc Signup user
 // @route Post /api/users/signup
@@ -156,6 +159,11 @@ const verifyCode = async (req, res, next) => {
     user.verificationCodeExpiration = undefined;
 
     await user.save();
+
+    await sendSuccessfulVerificationMessage({
+      lastName: user.lastName,
+      email: user.email,
+    });
 
     res.json({ message: 'Verification successful.' });
   } catch (err) {

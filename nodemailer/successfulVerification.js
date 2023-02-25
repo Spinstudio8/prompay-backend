@@ -6,7 +6,7 @@ const { google } = require('googleapis');
 const filePath = path.join(
   __dirname,
   '../views',
-  'successful-withdrawal-message.html'
+  'successful-verification-message.html'
 );
 let htmlFile = fs.readFileSync(filePath, 'utf-8');
 
@@ -24,21 +24,9 @@ const oAuth2Client = new google.auth.OAuth2(
 );
 oAuth2Client.setCredentials({ refresh_token: refreshToken });
 
-const sendSuccessfulWithdrawalMessage = async ({
-  lastName,
-  email,
-  amount,
-  wallet,
-  transactionId,
-  withdrawalId,
-}) => {
+const sendSuccessfulVerificationMessage = async ({ lastName, email }) => {
   // Replace placeholders with values from the request body
-  html = htmlFile
-    .replace(/{{lastName}}/g, lastName)
-    .replace(/{{amount}}/g, amount)
-    .replace(/{{wallet}}/g, wallet)
-    .replace(/{{transactionId}}/g, transactionId)
-    .replace(/{{withdrawalId}}/g, withdrawalId);
+  const html = htmlFile.replace(/{{lastName}}/g, lastName);
 
   const accessToken = await oAuth2Client.getAccessToken();
 
@@ -59,9 +47,9 @@ const sendSuccessfulWithdrawalMessage = async ({
   });
 
   const mailOptions = {
-    from: `Prompay Wallet Manager<jofwitsolution@gmail.com>`,
+    from: `Prompay <jofwitsolution@gmail.com>`,
     to: [email],
-    subject: 'Withdrawal from Prompay',
+    subject: 'Verification Successful',
     html,
   };
 
@@ -76,5 +64,5 @@ const sendSuccessfulWithdrawalMessage = async ({
   });
 };
 
-module.exports.sendSuccessfulWithdrawalMessage =
-  sendSuccessfulWithdrawalMessage;
+module.exports.sendSuccessfulVerificationMessage =
+  sendSuccessfulVerificationMessage;
