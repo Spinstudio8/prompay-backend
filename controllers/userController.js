@@ -210,6 +210,7 @@ const updateUserProfile = async (req, res, next) => {
         firstName: updatedUser.firstName,
         lastName: updatedUser.lastName,
         role: updatedUser.role,
+        isAdmin: updatedUser.isAdmin,
       });
 
       res.json({

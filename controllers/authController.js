@@ -43,7 +43,8 @@ const loginUser = async (req, res, next) => {
       user._id,
       user.firstName,
       user.lastName,
-      user.role
+      user.role,
+      user.isAdmin
     );
 
     res.status(200).json({
