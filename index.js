@@ -58,7 +58,7 @@ app.use(
   })
 );
 
-// connect to mongodb
+// connect to mongodb database
 mongodb();
 
 const port = process.env.PORT || 6001;
