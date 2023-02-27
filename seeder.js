@@ -15,12 +15,12 @@ mongodb();
 const importData = async () => {
   try {
     // await Subject.deleteMany();
-    // await Question.deleteMany();
-    await User.deleteMany();
+    await Question.deleteMany();
+    // await User.deleteMany();
 
     // const addSubjects = await Subject.insertMany(subjects);
-    // const addQuestions = await Question.insertMany(questions);
-    const addUsers = await User.insertMany(users);
+    const addQuestions = await Question.insertMany(questions);
+    // const addUsers = await User.insertMany(users);
 
     console.log('Data Imported!'.green.inverse);
     process.exit();

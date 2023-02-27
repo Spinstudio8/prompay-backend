@@ -73,6 +73,7 @@ const signupUser = async (req, res, next) => {
     await user.save();
 
     await sendCode({
+      firstName,
       lastName,
       email,
       verificationCode,
@@ -114,6 +115,7 @@ const resendVerificationCode = async (req, res, next) => {
     await user.save();
 
     await sendCode({
+      firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
       verificationCode,
@@ -290,8 +292,8 @@ const getUserDashboard = async (req, res, next) => {
 const getUserWallet = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id)
-      .select('-password')
-      .populate(['transactions', 'payment']);
+      .select('-password -hasAuthority -isAdmin')
+      .populate(['transactions', 'payments']);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }

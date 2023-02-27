@@ -5,6 +5,7 @@ const questions = [
     answer: 0,
     subject: '63ef8fe2b86f1eb0f9e0af19',
     description: '',
+    questionPlainText: 'Who won the FIFA World Cup in 2018?',
   },
   {
     question: 'Which country hosted the Summer Olympics in 2012?',
@@ -12,6 +13,7 @@ const questions = [
     answer: 0,
     subject: '63ef8fe2b86f1eb0f9e0af19',
     description: '',
+    questionPlainText: 'Which country hosted the Summer Olympics in 2012?',
   },
   {
     question: 'Who is considered the greatest basketball player of all time?',
@@ -24,6 +26,8 @@ const questions = [
     answer: 0,
     subject: '63ef8fe2b86f1eb0f9e0af19',
     description: '',
+    questionPlainText:
+      'Who is considered the greatest basketball player of all time?',
   },
   {
     question: 'Which team won the UEFA Champions League in 2020?',
@@ -31,6 +35,7 @@ const questions = [
     answer: 0,
     subject: '63ef8fe2b86f1eb0f9e0af19',
     description: '',
+    questionPlainText: 'Which team won the UEFA Champions League in 2020?',
   },
   {
     question:
@@ -39,6 +44,8 @@ const questions = [
     answer: 0,
     subject: '63ef8fe2b86f1eb0f9e0af19',
     description: '',
+    questionPlainText:
+      'What is the maximum number of overs in a limited-overs cricket match?',
   },
   {
     question: "Who won the Men's singles title at Wimbledon in 2020?",
@@ -46,6 +53,7 @@ const questions = [
     answer: 1,
     subject: '63ef8fe2b86f1eb0f9e0af19',
     description: '',
+    questionPlainText: "Who won the Men's singles title at Wimbledon in 2020?",
   },
   {
     question: 'Which athlete holds the world record in the 100m sprint?',
@@ -53,6 +61,8 @@ const questions = [
     answer: 0,
     subject: '63ef8fe2b86f1eb0f9e0af19',
     description: '',
+    questionPlainText:
+      'Which athlete holds the world record in the 100m sprint?',
   },
   {
     question: 'What is the name of the famous soccer stadium in Madrid, Spain?',
@@ -65,6 +75,8 @@ const questions = [
     answer: 1,
     subject: '63ef8fe2b86f1eb0f9e0af19',
     description: '',
+    questionPlainText:
+      'What is the name of the famous soccer stadium in Madrid, Spain?',
   },
   {
     question: 'Which country won the 2019 Rugby World Cup?',
@@ -72,6 +84,7 @@ const questions = [
     answer: 0,
     subject: '63ef8fe2b86f1eb0f9e0af19',
     description: '',
+    questionPlainText: 'Which country won the 2019 Rugby World Cup?',
   },
   {
     question: 'Which golfer has won the most Major championships?',
@@ -79,6 +92,7 @@ const questions = [
     answer: 0,
     subject: '63ef8fe2b86f1eb0f9e0af19',
     description: '',
+    questionPlainText: 'Which golfer has won the most Major championships?',
   },
 ];
 

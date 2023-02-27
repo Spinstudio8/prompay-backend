@@ -12,6 +12,10 @@ function validate(question) {
       .required()
       .label('Options'),
     answer: Joi.number().integer().min(0).max(3).required().label('Answer'),
+    questionPlainText: Joi.string()
+      .min(2)
+      .required()
+      .label('Question plain text'),
   });
 
   return schema.validate(question);

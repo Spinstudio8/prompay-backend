@@ -7,7 +7,14 @@ const validate = require('../validations/questionValidation');
 // @access private/admin
 const addQuestion = async (req, res, next) => {
   try {
-    const { subject, description, question, options, answer } = req.body;
+    const {
+      subject,
+      description,
+      question,
+      options,
+      answer,
+      questionPlainText,
+    } = req.body;
 
     // Validate Question
     const { error } = validate({
@@ -16,12 +23,13 @@ const addQuestion = async (req, res, next) => {
       question,
       options,
       answer: parseInt(answer),
+      questionPlainText,
     });
     if (error) {
       return res.status(400).json({ message: 'You must complete all fields' });
     }
 
-    const questionExists = await Question.findOne({ question });
+    const questionExists = await Question.findOne({ questionPlainText });
     if (questionExists) {
       return res.status(400).json({ message: 'Question already exists' });
     }
@@ -32,6 +40,7 @@ const addQuestion = async (req, res, next) => {
       answer: parseInt(answer),
       subject,
       description,
+      questionPlainText,
     });
 
     await questionObject.save();
@@ -85,7 +94,7 @@ const editQuestion = async (req, res, next) => {
 const getQuestions = async (req, res, next) => {
   try {
     const questions = await Question.find({})
-      .select('question subject')
+      .select('question subject questionPlainText')
       .populate({
         path: 'subject',
         select: 'title -_id',

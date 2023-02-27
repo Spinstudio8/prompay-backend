@@ -21,6 +21,7 @@ const oAuth2Client = new google.auth.OAuth2(
 oAuth2Client.setCredentials({ refresh_token: refreshToken });
 
 const sendCode = async ({
+  firstName,
   lastName,
   email,
   verificationCode,
@@ -28,6 +29,7 @@ const sendCode = async ({
 }) => {
   // Replace placeholders with values from the request body
   const html = htmlFile
+    .replace(/{{firstName}}/g, firstName)
     .replace(/{{lastName}}/g, lastName)
     .replace(/{{email}}/g, email)
     .replace(/{{verificationCode}}/g, verificationCode)
