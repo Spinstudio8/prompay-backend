@@ -42,7 +42,7 @@ const startAssessment = async (req, res, next) => {
     // Send questions only if next assessment time has elapsed
     if (Date.now() > nextAssessmentTime) {
       const questions = await Question.aggregate([
-        { $sample: { size: 5 } },
+        { $sample: { size: 50 } },
         {
           $lookup: {
             from: 'subjects',
@@ -69,7 +69,9 @@ const startAssessment = async (req, res, next) => {
       currentAssessment.nextAssessmentTime = undefined;
       res.json(currentAssessment);
     } else {
-      res.status(403).json({ message: 'Try again later' });
+      res.status(403).json({
+        message: 'Sorry, you can only have assessment once in a day.',
+      });
     }
   } catch (error) {
     next(error);
@@ -125,6 +127,9 @@ const submitAndCompute = async (req, res, next) => {
         answer.correct = false;
       }
     }
+
+    // console.log(score);
+    // return res.json(score);
 
     // Save the assessment, payment data and transaction data to the database
     const reward = 10; // 10 Naira per question

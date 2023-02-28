@@ -8,7 +8,7 @@ function validateAssessment(assessment) {
         Joi.object({
           question: Joi.objectId().required(),
           subject: Joi.objectId().required(),
-          answer: Joi.number().integer().min(0).max(3).required(),
+          answer: Joi.number().integer().min(0).max(4).required(),
         })
       )
       .required()
