@@ -1,4 +1,5 @@
 require('dotenv').config();
+const http = require('http');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
@@ -16,6 +17,7 @@ const subjectRoutes = require('./routes/subject');
 
 // THE APP
 const app = express();
+const server = http.createServer(app);
 
 if (!process.env.JWT_SECRET) {
   throw new Error('FATAL ERROR: jwtPrivateKey is not defined.');
@@ -37,7 +39,7 @@ app.use(
 app.use(express.urlencoded({ extended: true }));
 
 // built-in middleware for json
-app.use(express.json({ limit: '50mb' }));
+app.use(express.json({ limit: '100mb' }));
 // app.use(cookieParser());
 
 //Routes
@@ -66,5 +68,8 @@ app.use(
 // connect to mongodb database
 mongodb();
 
+// Set the timeout to 5 minutes
+server.timeout = 300000;
+
 const port = process.env.PORT || 6001;
-app.listen(port, () => console.log(`Listening on port ${port}...`));
+server.listen(port, () => console.log(`Listening on port ${port}...`));
