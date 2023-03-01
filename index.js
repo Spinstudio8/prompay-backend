@@ -24,18 +24,22 @@ if (!process.env.JWT_SECRET) {
 }
 
 // Cross Origin Resource Sharing
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      'https://www.theprompay.com',
+      'https://theprompay.com',
+      'https://prompay.vercel.app',
+      'http://localhost:3000',
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  })
+);
 
-// {
-//   origin: [
-//     process.env.CLIENT_URL,
-//     process.env.CLIENT_URL_2,
-//     process.env.CLIENT_URL_3,
-//     process.env.SERVER_URL,
-//   ],
-//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-//   preflightContinue: false,
-// }
+// process.env.CLIENT_URL,
+// process.env.CLIENT_URL_2,
+// process.env.CLIENT_URL_3,
+// process.env.SERVER_URL,
 
 // built-in middleware to handle urlencoded form data
 app.use(express.urlencoded({ extended: true }));

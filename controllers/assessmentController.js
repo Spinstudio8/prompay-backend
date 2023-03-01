@@ -5,6 +5,7 @@ const Transaction = require('../models/Transaction');
 const Payment = require('../models/Payment');
 const validateAssessment = require('../validations/assessmentValidation');
 const { conn } = require('../db');
+const cors = require('../utils/cors');
 
 /*
 const currentAssessment = {
