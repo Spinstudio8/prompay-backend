@@ -19,6 +19,9 @@ const subjectRoutes = require('./routes/subject');
 const app = express();
 const server = http.createServer(app);
 
+// Set the timeout to 5 minutes
+server.timeout = 300000;
+
 if (!process.env.JWT_SECRET) {
   throw new Error('FATAL ERROR: jwtPrivateKey is not defined.');
 }
@@ -26,12 +29,7 @@ if (!process.env.JWT_SECRET) {
 // Cross Origin Resource Sharing
 app.use(
   cors({
-    origin: [
-      'https://www.theprompay.com',
-      'https://theprompay.com',
-      'https://prompay.vercel.app',
-      'http://localhost:3000',
-    ],
+    origin: 'https://www.theprompay.com',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   })
 );
@@ -73,9 +71,6 @@ app.use(
 
 // connect to mongodb database
 mongodb();
-
-// Set the timeout to 5 minutes
-server.timeout = 300000;
 
 const port = process.env.PORT || 6001;
 server.listen(port, () => console.log(`Listening on port ${port}...`));
