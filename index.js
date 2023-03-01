@@ -24,18 +24,18 @@ if (!process.env.JWT_SECRET) {
 }
 
 // Cross Origin Resource Sharing
-app.use(
-  cors({
-    origin: [
-      process.env.CLIENT_URL,
-      process.env.CLIENT_URL_2,
-      process.env.CLIENT_URL_3,
-      process.env.SERVER_URL,
-    ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    preflightContinue: false,
-  })
-);
+app.use(cors());
+
+// {
+//   origin: [
+//     process.env.CLIENT_URL,
+//     process.env.CLIENT_URL_2,
+//     process.env.CLIENT_URL_3,
+//     process.env.SERVER_URL,
+//   ],
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+//   preflightContinue: false,
+// }
 
 // built-in middleware to handle urlencoded form data
 app.use(express.urlencoded({ extended: true }));
