@@ -27,6 +27,7 @@ app.use(
     origin: [
       process.env.CLIENT_URL,
       process.env.CLIENT_URL_2,
+      process.env.CLIENT_URL_3,
       process.env.SERVER_URL,
     ],
   })
