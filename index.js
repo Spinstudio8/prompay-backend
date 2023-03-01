@@ -20,7 +20,7 @@ const app = express();
 const server = http.createServer(app);
 
 // Set the timeout to 5 minutes
-server.timeout = 300000;
+// server.timeout = 300000;
 
 if (!process.env.JWT_SECRET) {
   throw new Error('FATAL ERROR: jwtPrivateKey is not defined.');
@@ -29,15 +29,20 @@ if (!process.env.JWT_SECRET) {
 // Cross Origin Resource Sharing
 app.use(
   cors({
-    origin: 'https://www.theprompay.com',
+    origin: [
+      process.env.CLIENT_URL,
+      process.env.CLIENT_URL_2,
+      process.env.CLIENT_URL_3,
+      process.env.SERVER_URL,
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   })
 );
 
-// process.env.CLIENT_URL,
-// process.env.CLIENT_URL_2,
-// process.env.CLIENT_URL_3,
-// process.env.SERVER_URL,
+// 'https://www.theprompay.com',
+// 'https://theprompay.com',
+// 'https://prompay.vercel.app',
+// 'http://localhost:3000',
 
 // built-in middleware to handle urlencoded form data
 app.use(express.urlencoded({ extended: true }));

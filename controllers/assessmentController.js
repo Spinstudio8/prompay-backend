@@ -147,29 +147,33 @@ const submitAndCompute = async (req, res, next) => {
     });
     await assessment.save({ session });
 
-    const payment = new Payment({
-      user: req.user._id,
-      amount: paymentAmount,
-      type: 'payment from prompay',
-      status: 'successful',
-      assessment: assessment._id,
-    });
-    await payment.save({ session });
+    // record transaction only if user win money
+    if (paymentAmount > 0) {
+      const payment = new Payment({
+        user: req.user._id,
+        amount: paymentAmount,
+        type: 'payment from prompay',
+        status: 'successful',
+        assessment: assessment._id,
+      });
+      await payment.save({ session });
 
-    const transaction = new Transaction({
-      user: req.user._id,
-      amount: paymentAmount,
-      type: 'payment from prompay',
-      status: 'successful',
-    });
-    await transaction.save({ session });
+      const transaction = new Transaction({
+        user: req.user._id,
+        amount: paymentAmount,
+        type: 'payment from prompay',
+        status: 'successful',
+      });
+      await transaction.save({ session });
 
-    // Update the user's score and wallet balance
-    user.totalScore += score;
-    user.wallet += paymentAmount;
+      // Update the user's score and wallet balance
+      user.totalScore += score;
+      user.wallet += paymentAmount;
+      user.transactions.push(transaction._id);
+      user.payments.push(payment._id);
+    }
+
     user.assessments.push(assessment._id);
-    user.transactions.push(transaction._id);
-    user.payments.push(payment._id);
     user.hasAssessment = false;
     await user.save({ session });
 

@@ -10,6 +10,9 @@ const { response } = require('express');
 const {
   sendSuccessfulWithdrawalMessage,
 } = require('../nodemailer/successfulWithdrawal');
+const {
+  sendWithdrawalRequestMessage,
+} = require('../nodemailer/withdrawalRequest');
 
 // @desc Withdraw earned money
 // @route POST /api/withdrawals
@@ -33,7 +36,6 @@ const withdrawal = async (req, res, next) => {
     }
     // deduct the amount
     user.wallet -= req.body.amount;
-    await user.save({ session });
 
     // record the transaction
     const transaction = new Transaction({
@@ -43,6 +45,9 @@ const withdrawal = async (req, res, next) => {
       status: 'pending',
     });
     await transaction.save({ session });
+
+    user.transactions.push(transaction._id);
+    await user.save({ session });
 
     //record the withdrawal info
     const withdrawal = new Withdrawal({
@@ -58,6 +63,15 @@ const withdrawal = async (req, res, next) => {
     await withdrawal.save({ session });
 
     await session.commitTransaction();
+
+    sendWithdrawalRequestMessage({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      amount: transaction.amount,
+      transactionId: transaction._id,
+      withdrawalId: withdrawal._id,
+    });
+
     res.status(201).json({
       message: 'Withdrawal pending',
       withdrawal: withdrawal,
