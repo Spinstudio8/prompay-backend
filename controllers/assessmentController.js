@@ -92,95 +92,99 @@ const startAssessment = async (req, res, next) => {
 const submitAndCompute = async (req, res, next) => {
   const session = await conn.startSession();
 
-  try {
-    session.startTransaction();
+  const data = req.body.assessmentData;
 
-    const { error } = validateAssessment(req.body);
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
-    }
+  res.status(400).json({ message: 'error testing' });
 
-    const user = await User.findById(req.user._id);
-    // if assessment end time has elapsed
-    if (
-      user.hasAssessment &&
-      Date.now() > user.currentAssessment.endTime + 240000 // + 4 minutes more
-    ) {
-      return res
-        .status(400)
-        .json({ message: "Timeout! Couldn't submit assessment." });
-    }
+  // try {
+  //   session.startTransaction();
 
-    const assessmentData = req.body.assessmentData;
-    const totalQuestion = assessmentData.length;
+  //   const { error } = validateAssessment(req.body);
+  //   if (error) {
+  //     return res.status(400).json({ message: error.details[0].message });
+  //   }
 
-    // Calculate the score for the assessment
-    let score = 0;
-    for (const answer of assessmentData) {
-      const question = await Question.findById(answer.question).session(
-        session
-      );
-      if (question?.answer == answer.answer) {
-        score += 1;
-        answer.correct = true;
-      } else {
-        answer.correct = false;
-      }
-    }
+  //   const user = await User.findById(req.user._id);
+  //   // if assessment end time has elapsed
+  //   if (
+  //     user.hasAssessment &&
+  //     Date.now() > user.currentAssessment.endTime + 240000 // + 4 minutes more
+  //   ) {
+  //     return res
+  //       .status(400)
+  //       .json({ message: "Timeout! Couldn't submit assessment." });
+  //   }
 
-    // console.log(score);
-    // return res.json(score);
+  //   const assessmentData = req.body.assessmentData;
+  //   const totalQuestion = assessmentData.length;
 
-    // Save the assessment, payment data and transaction data to the database
-    const reward = 10; // 10 Naira per question
-    const paymentAmount = score * reward;
-    const assessment = new Assessment({
-      user: req.user._id,
-      answers: assessmentData,
-      score: score,
-      amountEarned: paymentAmount,
-    });
-    await assessment.save({ session });
+  //   // Calculate the score for the assessment
+  //   let score = 0;
+  //   for (const answer of assessmentData) {
+  //     const question = await Question.findById(answer.question).session(
+  //       session
+  //     );
+  //     if (question?.answer == answer.answer) {
+  //       score += 1;
+  //       answer.correct = true;
+  //     } else {
+  //       answer.correct = false;
+  //     }
+  //   }
 
-    const payment = new Payment({
-      user: req.user._id,
-      amount: paymentAmount,
-      type: 'payment from prompay',
-      status: 'successful',
-      assessment: assessment._id,
-    });
-    await payment.save({ session });
+  //   // console.log(score);
+  //   // return res.json(score);
 
-    const transaction = new Transaction({
-      user: req.user._id,
-      amount: paymentAmount,
-      type: 'payment from prompay',
-      status: 'successful',
-    });
-    await transaction.save({ session });
+  //   // Save the assessment, payment data and transaction data to the database
+  //   const reward = 10; // 10 Naira per question
+  //   const paymentAmount = score * reward;
+  //   const assessment = new Assessment({
+  //     user: req.user._id,
+  //     answers: assessmentData,
+  //     score: score,
+  //     amountEarned: paymentAmount,
+  //   });
+  //   await assessment.save({ session });
 
-    // Update the user's score and wallet balance
-    user.totalScore += score;
-    user.wallet += paymentAmount;
-    user.assessments.push(assessment._id);
-    user.transactions.push(transaction._id);
-    user.payments.push(payment._id);
-    user.hasAssessment = false;
-    await user.save({ session });
+  //   const payment = new Payment({
+  //     user: req.user._id,
+  //     amount: paymentAmount,
+  //     type: 'payment from prompay',
+  //     status: 'successful',
+  //     assessment: assessment._id,
+  //   });
+  //   await payment.save({ session });
 
-    await session.commitTransaction();
-    res.status(201).json({
-      message: 'Assessment submitted successfully',
-      score,
-      totalQuestion,
-    });
-  } catch (err) {
-    console.error(err);
-    await session.abortTransaction();
-    next(err);
-  } finally {
-    session.endSession();
-  }
+  //   const transaction = new Transaction({
+  //     user: req.user._id,
+  //     amount: paymentAmount,
+  //     type: 'payment from prompay',
+  //     status: 'successful',
+  //   });
+  //   await transaction.save({ session });
+
+  //   // Update the user's score and wallet balance
+  //   user.totalScore += score;
+  //   user.wallet += paymentAmount;
+  //   user.assessments.push(assessment._id);
+  //   user.transactions.push(transaction._id);
+  //   user.payments.push(payment._id);
+  //   user.hasAssessment = false;
+  //   await user.save({ session });
+
+  //   await session.commitTransaction();
+  //   res.status(201).json({
+  //     message: 'Assessment submitted successfully',
+  //     score,
+  //     totalQuestion,
+  //   });
+  // } catch (err) {
+  //   console.error(err);
+  //   await session.abortTransaction();
+  //   next(err);
+  // } finally {
+  //   session.endSession();
+  // }
 };
 
 module.exports.startAssessment = startAssessment;
