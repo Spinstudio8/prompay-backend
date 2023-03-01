@@ -166,7 +166,6 @@ const submitAndCompute = async (req, res, next) => {
     user.transactions.push(transaction._id);
     user.payments.push(payment._id);
     user.hasAssessment = false;
-    user.currentAssessment = {};
     await user.save({ session });
 
     await session.commitTransaction();

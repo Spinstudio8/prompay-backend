@@ -239,7 +239,6 @@ const getUserDashboard = async (req, res, next) => {
     const user = await User.findById(req.params.id)
       .select('-password -hasAuthority -__v -isAdmin -currentAssessment')
       .populate('assessments');
-    console.log(user);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -267,10 +266,8 @@ const getUserDashboard = async (req, res, next) => {
     // record the score for each subject in subjects array
     for (const subject of subjects) {
       subject.score = scoreInSubject[subject._id];
-      console.log(scoreInSubject[subject._id]);
+      // console.log(scoreInSubject[subject._id]);
     }
-
-    console.log(subjects);
 
     user.assessments = user.assessments.length;
     res.json({
