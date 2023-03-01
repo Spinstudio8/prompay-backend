@@ -21,13 +21,6 @@ if (!process.env.JWT_SECRET) {
   throw new Error('FATAL ERROR: jwtPrivateKey is not defined.');
 }
 
-// built-in middleware to handle urlencoded form data
-app.use(express.urlencoded({ extended: true }));
-
-// built-in middleware for json
-app.use(express.json({ limit: '50mb' }));
-// app.use(cookieParser());
-
 // Cross Origin Resource Sharing
 app.use(
   cors({
@@ -38,6 +31,13 @@ app.use(
     ],
   })
 );
+
+// built-in middleware to handle urlencoded form data
+app.use(express.urlencoded({ extended: true }));
+
+// built-in middleware for json
+app.use(express.json({ limit: '50mb' }));
+// app.use(cookieParser());
 
 //Routes
 app.use('/', rootRoute);
