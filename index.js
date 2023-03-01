@@ -26,16 +26,16 @@ if (!process.env.JWT_SECRET) {
 // Cross Origin Resource Sharing
 app.use(
   cors({
-    origin: '*',
+    origin: [
+      process.env.CLIENT_URL,
+      process.env.CLIENT_URL_2,
+      process.env.CLIENT_URL_3,
+      process.env.SERVER_URL,
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    preflightContinue: false,
   })
 );
-
-// [
-//   process.env.CLIENT_URL,
-//   process.env.CLIENT_URL_2,
-//   process.env.CLIENT_URL_3,
-//   process.env.SERVER_URL,
-// ],
 
 // built-in middleware to handle urlencoded form data
 app.use(express.urlencoded({ extended: true }));
