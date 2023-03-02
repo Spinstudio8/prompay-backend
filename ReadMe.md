@@ -74,3 +74,12 @@ GET /: Returns an array of all users
 GET /:id: Returns a user with the specified id
 PUT /:id: Updates a user with the specified id with the provided data
 `DELETE
+
+"functions": {
+      "controllers/*.js": {
+        "maxDuration": 60
+      },
+      "middleware/**/*.js": {
+        "maxDuration": 60
+      }
+    }
