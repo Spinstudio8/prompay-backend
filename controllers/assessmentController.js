@@ -37,6 +37,7 @@ const startAssessment = async (req, res, next) => {
       });
     }
 
+    // get next assessment time
     const nextAssessmentTime = currentAssessment?.nextAssessmentTime
       ? currentAssessment.nextAssessmentTime
       : 0;
