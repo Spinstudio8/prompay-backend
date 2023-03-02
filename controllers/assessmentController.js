@@ -43,7 +43,7 @@ const startAssessment = async (req, res, next) => {
     // Send questions only if next assessment time has elapsed
     if (Date.now() > nextAssessmentTime) {
       const questions = await Question.aggregate([
-        { $sample: { size: 50 } },
+        { $sample: { size: 10 } },
         {
           $lookup: {
             from: 'subjects',
