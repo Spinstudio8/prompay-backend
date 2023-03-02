@@ -178,6 +178,11 @@ const submitAndCompute = async (req, res, next) => {
     await user.save({ session });
 
     await session.commitTransaction();
+    // Set the CORS headers
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'POST');
+    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
     res.status(201).json({
       message: 'Assessment submitted successfully',
       score,
