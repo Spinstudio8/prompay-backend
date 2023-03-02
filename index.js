@@ -4,6 +4,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const express = require('express');
+const timeout = require('connect-timeout');
 const { mongodb } = require('./db');
 const { errorHandler, notFound } = require('./middlewares/errorMiddleware');
 const rootRoute = require('./routes/root');
@@ -25,6 +26,8 @@ const server = http.createServer(app);
 if (!process.env.JWT_SECRET) {
   throw new Error('FATAL ERROR: jwtPrivateKey is not defined.');
 }
+
+app.use(timeout('300s'));
 
 // Cross Origin Resource Sharing
 app.use(

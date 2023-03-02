@@ -59,7 +59,7 @@ const sendWithdrawalRequestMessage = async ({
 
   const mailOptions = {
     from: `Prompay Wallet Manager<jofwitsolution@gmail.com>`,
-    to: 'toskem2000@gmail.com',
+    to: 'alagbarason@gmail.com',
     subject: 'Withdrawal request',
     html,
   };
