@@ -31,7 +31,7 @@ const getOverview = async (req, res, next) => {
       totalTestTaken: assessments,
       totalUsers: users,
       weeklyPayable: sumOfPendingWithdrawals,
-      wallet: 0,
+      wallet: req.user.wallet,
     });
   } catch (err) {
     next(err);

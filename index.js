@@ -27,7 +27,7 @@ if (!process.env.JWT_SECRET) {
   throw new Error('FATAL ERROR: jwtPrivateKey is not defined.');
 }
 
-app.use(timeout('300s'));
+// app.use(timeout('300s'));
 
 // Cross Origin Resource Sharing
 app.use(
@@ -41,11 +41,6 @@ app.use(
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   })
 );
-
-// 'https://www.theprompay.com',
-// 'https://theprompay.com',
-// 'https://prompay.vercel.app',
-// 'http://localhost:3000',
 
 // built-in middleware to handle urlencoded form data
 app.use(express.urlencoded({ extended: true }));
