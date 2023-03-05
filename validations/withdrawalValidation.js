@@ -30,7 +30,7 @@ function validateWithdrawalAction(info) {
     action: Joi.string()
       .valid(...actionsEnum)
       .required()
-      .label('Withdrawal type'),
+      .label('Withdrawal action'),
   });
 
   return schema.validate(info);
