@@ -167,7 +167,7 @@ const getWithdrawalById = async (req, res, next) => {
     const withdrawal = await Withdrawal.findById(req.params.id).populate({
       path: 'user',
       select:
-        'firstName lastName email phone _id totalScore wallet location imageUrl createdAt',
+        'firstName isVerified lastName email phone _id totalScore wallet location imageUrl createdAt',
     });
     if (!withdrawal) {
       return res.status(404).json({ message: 'Withdrawal not found' });

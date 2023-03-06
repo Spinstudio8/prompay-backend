@@ -38,4 +38,18 @@ const getOverview = async (req, res, next) => {
   }
 };
 
+// @desc Admin get admin users
+// @route GET /api/admin/admin-users
+// @access Private/Admin
+const getAdminUsers = async (req, res, next) => {
+  try {
+    const admins = await User.find({ isAdmin: true }).select('-password -__v');
+
+    res.json(admins);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports.getOverview = getOverview;
+module.exports.getAdminUsers = getAdminUsers;
