@@ -178,7 +178,7 @@ const verifyCode = async (req, res, next) => {
 // @access Private
 const getUserProfile = async (req, res) => {
   const user = await User.findById(req.params.id).select(
-    '-password -__v -currentAssessment'
+    'firstName lastName email phone location role isAdmin birthDay imageUrl isVerified gender createdAt updatedAt'
   );
 
   if (user) {
@@ -207,20 +207,29 @@ const updateUserProfile = async (req, res, next) => {
 
       const updatedUser = await user.save();
 
-      const token = generateToken({
-        id: updatedUser._id,
-        firstName: updatedUser.firstName,
-        lastName: updatedUser.lastName,
-        role: updatedUser.role,
-        isAdmin: updatedUser.isAdmin,
-      });
+      const token = generateToken(
+        updatedUser._id,
+        updatedUser.firstName,
+        updatedUser.lastName,
+        updatedUser.role,
+        updatedUser.isAdmin
+      );
 
       res.json({
         _id: updatedUser._id,
         firstName: updatedUser.firstName,
         lastName: updatedUser.lastName,
         email: updatedUser.email,
+        phone: updatedUser.phone,
+        gender: updatedUser.gender,
+        isAdmin: updatedUser.isAdmin,
+        location: updatedUser.location,
+        imageUrl: updatedUser.imageUrl,
+        birthDay: updatedUser.birthDay,
+        isVerified: updatedUser.isVerified,
         role: updatedUser.role,
+        createdAt: updatedUser.createdAt,
+        updatedAt: updatedUser.updatedAt,
         token: token,
       });
     } else {
