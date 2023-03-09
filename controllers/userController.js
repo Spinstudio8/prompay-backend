@@ -324,20 +324,24 @@ const getUserWallet = async (req, res, next) => {
 // @access Private/Admin
 const getUsers = async (req, res, next) => {
   try {
-    const pageSize = Number(req.query.pageSize) || 10;
-    const page = Number(req.query.pageNumber) || 1;
+    // const pageSize = Number(req.query.pageSize) || 10;
+    // const page = Number(req.query.pageNumber) || 1;
 
-    const count = await User.countDocuments({});
-    const users = await User.find({})
-      .select('-password -__v')
-      .limit(pageSize)
-      .skip(pageSize * (page - 1));
+    // const count = await User.countDocuments({});
+    // const users = await User.find({})
+    //   .select('-password -__v')
+    //   .limit(pageSize)
+    //   .skip(pageSize * (page - 1));
 
-    res.json({
-      users,
-      page,
-      pages: Math.ceil(count / pageSize),
-    });
+    // res.json({
+    //   users,
+    //   page,
+    //   pages: Math.ceil(count / pageSize),
+    // });
+
+    const users = await User.find({}).select('-password -__v');
+
+    res.json(users);
   } catch (error) {
     next(error);
   }
