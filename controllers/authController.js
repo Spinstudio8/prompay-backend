@@ -47,8 +47,26 @@ const loginUser = async (req, res, next) => {
       user.isAdmin
     );
 
+    const userInfo = {
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone,
+      gender: user.gender,
+      isAdmin: user.isAdmin,
+      location: user.location,
+      imageUrl: user.imageUrl,
+      birthDay: user.birthDay,
+      isVerified: user.isVerified,
+      role: user.role,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+
     res.status(200).json({
-      token: token,
+      token,
+      userInfo,
     });
   } catch (error) {
     next(error);

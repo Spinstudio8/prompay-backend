@@ -48,7 +48,7 @@ function validateUserProfile(user) {
   const schema = Joi.object({
     firstName: Joi.string().min(2).max(50).required().label('First name'),
     lastName: Joi.string().min(2).max(50).required().label('Last name'),
-    location: Joi.string().min(2).max(50).required().label('Location'),
+    location: Joi.string().min(0).max(50).label('Location'),
   });
 
   return schema.validate(user);
@@ -63,7 +63,7 @@ function adminValidateUserProfile(user) {
       .valid(...genderEnum)
       .required()
       .label('Gender'),
-    location: Joi.string().min(2).max(50).label('Location'),
+    location: Joi.string().min(0).max(50).label('Location'),
     isAdmin: Joi.boolean().required().label('Is Admin'),
     hasAuthority: Joi.boolean().required().label('Has Authority'),
   });

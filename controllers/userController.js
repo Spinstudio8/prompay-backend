@@ -380,7 +380,7 @@ const updateUserById = async (req, res, next) => {
   try {
     const { error } = adminValidateUserProfile(req.body);
     if (error) {
-      res.status(400).json({ message: error.details[0].message });
+      return res.status(400).json({ message: error.details[0].message });
     }
 
     const user = await User.findById(req.params.id);
@@ -395,7 +395,7 @@ const updateUserById = async (req, res, next) => {
       user.location = req.body.location;
 
       const updatedUser = await user.save();
-      user.password = '';
+      updatedUser.password = undefined;
 
       res.json(updatedUser);
     } else {
