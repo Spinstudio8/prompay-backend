@@ -44,6 +44,21 @@ function validateEmail(email) {
   return schema.validate(email);
 }
 
+function validatePassword(password) {
+  const schema = Joi.object({
+    password: Joi.string()
+      .min(10)
+      .max(16)
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+      )
+      .required()
+      .label('Password'),
+  });
+
+  return schema.validate(password);
+}
+
 function validateUserProfile(user) {
   const schema = Joi.object({
     firstName: Joi.string().min(2).max(50).required().label('First name'),
@@ -74,5 +89,6 @@ function adminValidateUserProfile(user) {
 module.exports.validateUserSignup = validateUserSignup;
 module.exports.validateUserLogin = validateUserLogin;
 module.exports.validateEmail = validateEmail;
+module.exports.validatePassword = validatePassword;
 module.exports.validateUserProfile = validateUserProfile;
 module.exports.adminValidateUserProfile = adminValidateUserProfile;

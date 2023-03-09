@@ -11,6 +11,9 @@ const {
   deleteUser,
   verifyCode,
   getUserWallet,
+  resetPassword,
+  verifyPasswordToken,
+  setNewPassword,
 } = require('../controllers/userController');
 const { protect, admin } = require('../middlewares/authMiddleware');
 
@@ -31,5 +34,9 @@ router
   .route('/:id')
   .get(protect, admin, getUserById)
   .patch(protect, admin, updateUserById);
+
+router.post('/reset-password', resetPassword);
+router.get('/verify-password-token/:token', verifyPasswordToken);
+router.post('/new-password', setNewPassword);
 
 module.exports = router;

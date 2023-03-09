@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const Assessment = require('../models/Assessment');
@@ -10,10 +11,15 @@ const {
   validateUserSignup,
   validateEmail,
   adminValidateUserProfile,
+  validatePassword,
 } = require('../validations/userValidation');
 const {
   sendSuccessfulVerificationMessage,
 } = require('../nodemailer/successfulVerification');
+const { sendPasswordToken } = require('../nodemailer/password-reset-message');
+const {
+  sendSuccessfulPasswordMessage,
+} = require('../nodemailer/successful-password-message');
 
 // @desc Signup user
 // @route Post /api/users/signup
@@ -86,7 +92,6 @@ const signupUser = async (req, res, next) => {
       verificationCodeExpiration: 300000, // 300,000ms = '5 minutes'
     });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
@@ -406,6 +411,115 @@ const updateUserById = async (req, res, next) => {
   }
 };
 
+// @desc Reset Password
+// @route POST /api/users/reset-password
+// @access Public
+const resetPassword = async (req, res) => {
+  try {
+    crypto.pseudoRandomBytes(32, async (err, buffer) => {
+      if (err) {
+        return res.status(400).json({ message: 'Bad request' });
+      }
+      const token = buffer.toString('hex');
+      // console.log(token);
+      const email = req.body.email;
+      let user = await User.findOne({ email });
+
+      if (!user) {
+        return res
+          .status(404)
+          .json({ message: 'User with the given email does not exist.' });
+      }
+
+      user.resetToken = token;
+      user.resetTokenExpiration = Date.now() + 300000; //current time + 5min(300000ms)
+      user = await user.save();
+
+      await sendPasswordToken({ email, token });
+
+      res.json({
+        message: 'A link to change password has been sent to your email.',
+      });
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};
+
+// @desc Verify password token
+// @route GET /api/users/verify-password-token/:token
+// @access Public
+const verifyPasswordToken = async (req, res) => {
+  const token = req.params.token;
+
+  const user = await User.findOne({
+    resetToken: token,
+    resetTokenExpiration: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return res
+      .status(400)
+      .json({ message: 'Token expired. Make new request.' });
+  }
+
+  res.json({
+    userId: user._id.toString(),
+    passwordToken: token,
+  });
+};
+
+// @desc Set New Password
+// @route POST /api/users/new-password
+// @access Public
+const setNewPassword = async (req, res) => {
+  const { userId, passwordToken, password } = req.body;
+
+  const { error } = validatePassword({ password });
+  if (error) {
+    // if it is the regex pattern
+    if (error.details[0].context?.regex) {
+      return res.status(400).json({
+        message:
+          'Password must contain at least one uppercase, lowercase, number and special character',
+      });
+    }
+
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
+  const user = await User.findOne({
+    resetToken: passwordToken,
+    resetTokenExpiration: { $gt: Date.now() },
+    _id: userId,
+  });
+
+  if (!user) {
+    return res
+      .status(400)
+      .json({ message: 'Token expired. Make new request.' });
+  }
+
+  // hash the password
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  user.password = hashedPassword;
+  user.resetToken = undefined;
+  user.resetTokenExpiration = undefined;
+
+  await user.save();
+
+  await sendSuccessfulPasswordMessage({
+    email: user.email,
+    lastName: user.lastName,
+  });
+
+  res.json({
+    message: 'Password changed successfully.',
+  });
+};
+
 module.exports.signupUser = signupUser;
 module.exports.resendVerificationCode = resendVerificationCode;
 module.exports.verifyCode = verifyCode;
@@ -417,3 +531,6 @@ module.exports.getUsers = getUsers;
 module.exports.deleteUser = deleteUser;
 module.exports.getUserById = getUserById;
 module.exports.updateUserById = updateUserById;
+module.exports.resetPassword = resetPassword;
+module.exports.verifyPasswordToken = verifyPasswordToken;
+module.exports.setNewPassword = setNewPassword;
