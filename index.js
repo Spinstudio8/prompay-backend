@@ -15,6 +15,7 @@ const assessmentRoutes = require('./routes/assessment');
 const withdrawalRoutes = require('./routes/withdrawal');
 const adminRoutes = require('./routes/admin');
 const subjectRoutes = require('./routes/subject');
+const settingsRoutes = require('./routes/settings');
 
 // THE APP
 const app = express();
@@ -58,6 +59,7 @@ app.use('/api/assessment', assessmentRoutes);
 app.use('/api/withdrawals', withdrawalRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/subjects', subjectRoutes);
+app.use('/api/settings', settingsRoutes);
 
 //Error Handler
 app.use(errorHandler);
