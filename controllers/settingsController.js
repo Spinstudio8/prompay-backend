@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const { validateResetPassword } = require('../validations/settingsValidation');
+const Setting = require('../models/Setting');
 
 // @desc User reset password
 // @route POST /api/settings/reset-password
@@ -30,7 +31,7 @@ const resetPassword = async (req, res, next) => {
     // check if the password is correct
     const isValid = await bcrypt.compare(currentPassword, user.password);
     if (!isValid) {
-      return res.status(400).send({ message: 'Current password is invalid' });
+      return res.status(400).send({ message: 'Invalid current password' });
     }
 
     user.password = await bcrypt.hash(newPassword, 10);
@@ -42,4 +43,18 @@ const resetPassword = async (req, res, next) => {
   }
 };
 
+// @desc Admin Get all Settings
+// @route GET /api/settings
+// @access Private/Admin
+const getAllSettings = async (req, res, next) => {
+  try {
+    const settings = await Setting.find({});
+
+    res.json(settings);
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports.resetPassword = resetPassword;
+module.exports.getAllSettings = getAllSettings;
