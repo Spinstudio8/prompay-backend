@@ -1,6 +1,9 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
-const { validateResetPassword } = require('../validations/settingsValidation');
+const {
+  validateResetPassword,
+  validateSettings,
+} = require('../validations/settingsValidation');
 const Setting = require('../models/Setting');
 
 // @desc User reset password
@@ -65,6 +68,11 @@ const saveSettings = async (req, res, next) => {
 
     if (!settings) {
       return res.status(404).json({ message: 'Invalid settings' });
+    }
+
+    const { error } = validateSettings(req.body.data, settings.setting);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
     }
 
     settings.data = req.body.data;
