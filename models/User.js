@@ -34,7 +34,7 @@ const userSchema = new Schema(
     imageUrl: { type: String },
     password: { type: String, required: true, minlength: 10, maxlength: 255 },
     totalScore: { type: Number, default: 0 },
-    wallet: { type: Number, default: 1000 },
+    wallet: { type: Number, default: 300 },
     isVerified: { type: Boolean, default: false },
     verificationCode: { type: String },
     verificationCodeExpiration: { type: Date },

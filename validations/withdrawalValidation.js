@@ -16,7 +16,7 @@ function validateWithdrawal(info) {
       .required()
       .label('Account number'),
     accountName: Joi.string().min(2).max(50).required().label('Account name'),
-    amount: Joi.number().integer().min(2000).required().label('Amount'),
+    amount: Joi.number().integer().required().label('Amount'),
   });
 
   return schema.validate(info);

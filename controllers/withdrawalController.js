@@ -1,12 +1,12 @@
 const Withdrawal = require('../models/Withdrawal');
 const Transaction = require('../models/Transaction');
 const User = require('../models/User');
+const Setting = require('../models/Setting');
 const {
   validateWithdrawal,
   validateWithdrawalAction,
 } = require('../validations/withdrawalValidation');
 const { conn } = require('../db');
-const { response } = require('express');
 const {
   sendSuccessfulWithdrawalMessage,
 } = require('../nodemailer/successfulWithdrawal');
@@ -26,6 +26,29 @@ const withdrawal = async (req, res, next) => {
     const { error } = validateWithdrawal(req.body);
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
+    }
+
+    // Get assessment settings
+    const settings = await Setting.findOne({
+      setting: 'assessment settings',
+    });
+    if (!settings) {
+      return res.status(403).json({
+        message: 'Settings error.',
+      });
+    }
+    const minWithdrawal = parseInt(settings.data.minWithdrawal) || 500;
+    const maxWithdrawal = parseInt(settings.data.maxWithdrawal) || 50000;
+
+    if (req.body.amount < minWithdrawal) {
+      return res.status(400).json({
+        message: `The minimum withdrawal is ${minWithdrawal}`,
+      });
+    }
+    if (req.body.amount > maxWithdrawal) {
+      return res.status(400).json({
+        message: `The maximum withdrawal is ${maxWithdrawal}`,
+      });
     }
 
     const userId = req.user._id;

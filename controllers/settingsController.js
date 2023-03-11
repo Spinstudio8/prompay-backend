@@ -31,7 +31,7 @@ const resetPassword = async (req, res, next) => {
     // check if the password is correct
     const isValid = await bcrypt.compare(currentPassword, user.password);
     if (!isValid) {
-      return res.status(400).send({ message: 'Invalid current password' });
+      return res.status(400).json({ message: 'Invalid current password' });
     }
 
     user.password = await bcrypt.hash(newPassword, 10);
@@ -56,5 +56,26 @@ const getAllSettings = async (req, res, next) => {
   }
 };
 
+// @desc Admin Save settings
+// @route POST /api/settings/:id/save
+// @access Private/Admin
+const saveSettings = async (req, res, next) => {
+  try {
+    const settings = await Setting.findById(req.params.id);
+
+    if (!settings) {
+      return res.status(404).json({ message: 'Invalid settings' });
+    }
+
+    settings.data = req.body.data;
+    await settings.save();
+
+    res.json({ settings, message: 'Settings saved successfully' });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports.resetPassword = resetPassword;
 module.exports.getAllSettings = getAllSettings;
+module.exports.saveSettings = saveSettings;

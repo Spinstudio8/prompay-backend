@@ -3,6 +3,7 @@ const Question = require('../models/Question');
 const Assessment = require('../models/Assessment');
 const Transaction = require('../models/Transaction');
 const Payment = require('../models/Payment');
+const Setting = require('../models/Setting');
 const validateAssessment = require('../validations/assessmentValidation');
 const { conn } = require('../db');
 const cors = require('../utils/cors');
@@ -43,8 +44,17 @@ const startAssessment = async (req, res, next) => {
       : 0;
     // Send questions only if next assessment time has elapsed
     if (Date.now() > nextAssessmentTime) {
+      const settings = await Setting.findOne({
+        setting: 'assessment settings',
+      });
+      if (!settings) {
+        return res.status(403).json({
+          message: 'Settings error.',
+        });
+      }
+      const totalQuestions = parseInt(settings.data.totalQuestions) || 50;
       const questions = await Question.aggregate([
-        { $sample: { size: 50 } },
+        { $sample: { size: totalQuestions } },
         {
           $lookup: {
             from: 'subjects',
@@ -94,10 +104,6 @@ const startAssessment = async (req, res, next) => {
 const submitAndCompute = async (req, res, next) => {
   const session = await conn.startSession();
 
-  // const data = req.body.assessmentData;
-
-  // res.status(400).json({ message: 'error testing' });
-
   try {
     session.startTransaction();
 
@@ -105,6 +111,17 @@ const submitAndCompute = async (req, res, next) => {
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
+
+    // Get assessment settings
+    const settings = await Setting.findOne({
+      setting: 'assessment settings',
+    });
+    if (!settings) {
+      return res.status(403).json({
+        message: 'Settings error.',
+      });
+    }
+    const pricePerQuestion = settings.data.pricePerQuestion || 10;
 
     const user = await User.findById(req.user._id);
     // if assessment end time has elapsed
@@ -138,8 +155,7 @@ const submitAndCompute = async (req, res, next) => {
     // return res.json(score);
 
     // Save the assessment, payment data and transaction data to the database
-    const reward = 10; // 10 Naira per question
-    const paymentAmount = score * reward;
+    const paymentAmount = score * parseInt(pricePerQuestion);
     const assessment = new Assessment({
       user: req.user._id,
       answers: assessmentData,
@@ -180,9 +196,9 @@ const submitAndCompute = async (req, res, next) => {
 
     await session.commitTransaction();
     // Set the CORS headers
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Methods', 'POST');
-    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    // res.set('Access-Control-Allow-Origin', '*');
+    // res.set('Access-Control-Allow-Methods', 'POST');
+    // res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
     res.status(201).json({
       message: 'Assessment submitted successfully',
