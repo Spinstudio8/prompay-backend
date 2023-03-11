@@ -16,6 +16,7 @@ const withdrawalRoutes = require('./routes/withdrawal');
 const adminRoutes = require('./routes/admin');
 const subjectRoutes = require('./routes/subject');
 const settingsRoutes = require('./routes/settings');
+const supportRoutes = require('./routes/support');
 
 // THE APP
 const app = express();
@@ -60,6 +61,7 @@ app.use('/api/withdrawals', withdrawalRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/subjects', subjectRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/support', supportRoutes);
 
 //Error Handler
 app.use(errorHandler);
