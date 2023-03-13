@@ -2,15 +2,16 @@ const settings = [
   {
     setting: 'withdrawal settings',
     data: {
-      minWithdrawal: 2000,
-      maxWithdrawal: 100000,
+      minWithdrawal: 3000,
+      maxWithdrawal: 20000,
     },
   },
   {
     setting: 'assessment settings',
     data: {
-      totalQuestions: 50,
-      pricePerQuestion: 10,
+      totalQuestions: 100,
+      pricePerQuestion: 15,
+      assessmentTime: 60,
     },
   },
 ];

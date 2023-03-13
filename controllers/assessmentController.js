@@ -68,10 +68,12 @@ const startAssessment = async (req, res, next) => {
         { $project: { answer: 0, __v: 0 } },
       ]);
 
+      let assessmentTime = settings.data.assessmentTime || 60; // minutes
+      assessmentTime = assessmentTime * 60 * 1000; // coverts minutes to milliseconds
       currentAssessment = {
         questions: questions,
         startTime: Date.now(),
-        endTime: Date.now() + 3600000, // 3,600,000 milliseconds = 1hour
+        endTime: Date.now() + assessmentTime,
         nextAssessmentTime: Date.now() + 86400000, // 86,400,000 = 24hour
       };
       user.currentAssessment = currentAssessment;

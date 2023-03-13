@@ -46,6 +46,11 @@ function validateSettings(data, settings) {
         .min(1)
         .required()
         .label('Price per question'),
+      assessmentTime: Joi.number()
+        .integer()
+        .min(1)
+        .required()
+        .label('Assessment Time'),
     });
 
     return schema.validate(data);
