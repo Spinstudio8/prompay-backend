@@ -71,7 +71,7 @@ const startAssessment = async (req, res, next) => {
       currentAssessment = {
         questions: questions,
         startTime: Date.now(),
-        endTime: Date.now() + 3600000 + 180000, // 3,600,000 milliseconds = 1hour + 3min
+        endTime: Date.now() + 3600000, // 3,600,000 milliseconds = 1hour
         nextAssessmentTime: Date.now() + 86400000, // 86,400,000 = 24hour
       };
       user.currentAssessment = currentAssessment;
@@ -79,6 +79,7 @@ const startAssessment = async (req, res, next) => {
       await user.save();
 
       currentAssessment.nextAssessmentTime = undefined;
+      console.log(currentAssessment);
       res.json(currentAssessment);
     } else {
       res.status(403).json({
@@ -127,7 +128,7 @@ const submitAndCompute = async (req, res, next) => {
     // if assessment end time has elapsed
     if (
       user.hasAssessment &&
-      Date.now() > user.currentAssessment.endTime + 240000 // + 4 minutes more
+      Date.now() > user.currentAssessment.endTime + 480000 // + 8 minutes more
     ) {
       return res
         .status(400)
