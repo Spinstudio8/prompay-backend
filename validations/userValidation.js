@@ -10,7 +10,7 @@ function validateUserSignup(user) {
     email: Joi.string().max(50).required().email().label('Email'),
     phone: Joi.string().required().label('Phone'),
     location: Joi.string().max(50).required().label('Location'),
-    birthDay: Joi.date().min().required().label('Birth day'),
+    birthDay: Joi.date().required().label('Birth day'),
     gender: Joi.string()
       .valid(...genderEnum)
       .required()
