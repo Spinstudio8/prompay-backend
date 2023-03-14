@@ -12,6 +12,7 @@ const {
   validateEmail,
   adminValidateUserProfile,
   validatePassword,
+  validateUserBirthDay,
 } = require('../validations/userValidation');
 const {
   sendSuccessfulVerificationMessage,
@@ -40,8 +41,22 @@ const signupUser = async (req, res, next) => {
       return res.status(400).json({ message: error.details[0].message });
     }
 
-    let { firstName, lastName, email, phone, birthDay, gender, password } =
-      req.body;
+    let {
+      firstName,
+      lastName,
+      email,
+      phone,
+      location,
+      birthDay,
+      gender,
+      password,
+    } = req.body;
+
+    // validate birth day
+    const isUnderAge = validateUserBirthDay(birthDay);
+    if (isUnderAge) {
+      return res.status(400).json({ message: isUnderAge });
+    }
 
     email = email.toLowerCase();
     // check if a user with the same email already exists
@@ -70,6 +85,7 @@ const signupUser = async (req, res, next) => {
       firstName,
       lastName,
       phone,
+      location,
       birthDay,
       gender,
       verificationCode,

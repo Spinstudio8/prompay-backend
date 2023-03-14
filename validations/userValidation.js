@@ -9,7 +9,8 @@ function validateUserSignup(user) {
     lastName: Joi.string().min(2).max(50).required().label('Last name'),
     email: Joi.string().max(50).required().email().label('Email'),
     phone: Joi.string().required().label('Phone'),
-    birthDay: Joi.date().required().label('Birth day'),
+    location: Joi.string().max(50).required().label('Location'),
+    birthDay: Joi.date().min().required().label('Birth day'),
     gender: Joi.string()
       .valid(...genderEnum)
       .required()
@@ -25,6 +26,20 @@ function validateUserSignup(user) {
   });
 
   return schema.validate(user);
+}
+
+function validateUserBirthDay(dateString) {
+  const timestamp = 473040000000; // timestamp for 15 years
+
+  let birthDayInMillis = new Date(dateString).getTime();
+
+  birthDayInMillis = Date.now() - birthDayInMillis;
+
+  if (birthDayInMillis >= timestamp) {
+    return null;
+  } else {
+    return 'You must be 15 years or older';
+  }
 }
 
 function validateUserLogin(user) {
@@ -87,6 +102,7 @@ function adminValidateUserProfile(user) {
 }
 
 module.exports.validateUserSignup = validateUserSignup;
+module.exports.validateUserBirthDay = validateUserBirthDay;
 module.exports.validateUserLogin = validateUserLogin;
 module.exports.validateEmail = validateEmail;
 module.exports.validatePassword = validatePassword;
