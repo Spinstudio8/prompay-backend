@@ -65,7 +65,11 @@ const sendProblemToSupport = async ({
 
   const mailOptions = {
     from: `Prompay <jofwitsolution@gmail.com>`,
-    to: ['jofwitsolution@gmail.com', 'tosinfakile01@gmail.com'],
+    to: [
+      'jofwitsolution@gmail.com',
+      'tosinfakile01@gmail.com',
+      'support@theprompay.com',
+    ],
     subject: area,
     html,
   };
