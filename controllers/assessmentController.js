@@ -81,7 +81,7 @@ const startAssessment = async (req, res, next) => {
       await user.save();
 
       currentAssessment.nextAssessmentTime = undefined;
-      console.log(currentAssessment);
+      // console.log(currentAssessment);
       res.json(currentAssessment);
     } else {
       res.status(403).json({
@@ -124,7 +124,7 @@ const submitAndCompute = async (req, res, next) => {
         message: 'Settings error.',
       });
     }
-    const pricePerQuestion = settings.data.pricePerQuestion || 10;
+    const pricePerQuestion = parseInt(settings.data.pricePerQuestion) || 10;
 
     const user = await User.findById(req.user._id);
     // if assessment end time has elapsed

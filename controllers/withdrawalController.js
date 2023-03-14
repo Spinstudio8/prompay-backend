@@ -30,14 +30,15 @@ const withdrawal = async (req, res, next) => {
 
     // Get assessment settings
     const settings = await Setting.findOne({
-      setting: 'assessment settings',
+      setting: 'withdrawal settings',
     });
     if (!settings) {
       return res.status(403).json({
         message: 'Settings error.',
       });
     }
-    const minWithdrawal = parseInt(settings.data.minWithdrawal) || 500;
+
+    const minWithdrawal = parseInt(settings.data.minWithdrawal) || 200;
     const maxWithdrawal = parseInt(settings.data.maxWithdrawal) || 50000;
 
     if (req.body.amount < minWithdrawal) {

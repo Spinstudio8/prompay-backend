@@ -31,3 +31,6 @@ function validateBirthDay(dateString) {
 }
 
 console.log(validateBirthDay('1994-03-17'));
+
+const today = new Date().toLocaleDateString();
+console.log(today);

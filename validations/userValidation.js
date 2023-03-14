@@ -29,7 +29,7 @@ function validateUserSignup(user) {
 }
 
 function validateUserBirthDay(dateString) {
-  const timestamp = 473040000000; // timestamp for 15 years
+  const timestamp = 504576000000; // timestamp for 16 years
 
   let birthDayInMillis = new Date(dateString).getTime();
 
@@ -38,7 +38,7 @@ function validateUserBirthDay(dateString) {
   if (birthDayInMillis >= timestamp) {
     return null;
   } else {
-    return 'You must be 15 years or older';
+    return 'You must be 16 years or older';
   }
 }
 
