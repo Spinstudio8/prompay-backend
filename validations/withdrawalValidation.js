@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 // Define the enum values
-const typeEnum = ['bank', 'cryptocurrency'];
+const typeEnum = ['bank'];
 
 function validateWithdrawal(info) {
   const schema = Joi.object({
